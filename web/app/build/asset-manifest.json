@@ -1,0 +1,27 @@
+{
+  "files": {
+    "main.css": "/static/css/main.d6dd04c6.css",
+    "main.js": "/static/js/main.d35c740a.js",
+    "static/js/27.ea87fb90.chunk.js": "/static/js/27.ea87fb90.chunk.js",
+    "static/media/shopping.gif": "/static/media/shopping.9161b015c27eecb6303e.gif",
+    "static/media/Selling.gif": "/static/media/Selling.a75c4b82d6acfa8a3f1f.gif",
+    "static/media/report.gif": "/static/media/report.29afc20f7ef9ba1bd7c3.gif",
+    "static/media/product.png": "/static/media/product.868bdb233359ebf3c405.png",
+    "static/media/star.png": "/static/media/star.8714f502bcac3b6202cb.png",
+    "static/media/candidates.gif": "/static/media/candidates.363e83ca2073686c78f2.gif",
+    "static/media/service.gif": "/static/media/service.94fa0f0400f24a254475.gif",
+    "static/media/banknotes.png": "/static/media/banknotes.edce86571504b90d710e.png",
+    "static/media/checklist.gif": "/static/media/checklist.11606ba41eaa95333760.gif",
+    "static/media/mochi-young-woman.gif": "/static/media/mochi-young-woman.aeb2468f4ebc5d59e014.gif",
+    "static/media/coin.gif": "/static/media/coin.fbce5d5b841e58bc4899.gif",
+    "static/media/calendar.svg": "/static/media/calendar.665b9100bf882084f67238305becf756.svg",
+    "static/media/welcome.svg": "/static/media/welcome.7b7277c019354460bb0fc818618ebc71.svg",
+    "static/media/growth.svg": "/static/media/growth.a520c193552a6ee213767e696bcfd98d.svg",
+    "static/media/Exit.svg": "/static/media/Exit.a21b186f98f848107b0534769b9c50f1.svg",
+    "index.html": "/index.html"
+  },
+  "entrypoints": [
+    "static/css/main.d6dd04c6.css",
+    "static/js/main.d35c740a.js"
+  ]
+}
