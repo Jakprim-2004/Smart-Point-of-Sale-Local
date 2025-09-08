@@ -7,7 +7,6 @@ import mochiGif from '../assets/mochi-young-woman.gif';
 
 function LoginCustomer() {
     const [loginData, setLoginData] = useState({
-        
         email: "",
         phone: ""
     });
@@ -41,10 +40,10 @@ function LoginCustomer() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!loginData.name || !loginData.email || !loginData.phone) {
+        if (!loginData.email || !loginData.phone) {
             Swal.fire({
                 title: 'แจ้งเตือน',
-                text: 'กรุณากรอกข้อมูลให้ครบทุกช่อง',
+                text: 'กรุณากรอกทั้งอีเมลและเบอร์โทรศัพท์',
                 icon: 'warning'
             });
             return;
@@ -151,26 +150,6 @@ function LoginCustomer() {
                                         <form onSubmit={handleSubmit}>
                                             <div className="mb-4">
                                                 <label className="form-label" style={{fontWeight: '500'}}>
-                                                    ชื่อ-นามสกุล <span className="text-danger">*</span>
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    name="name"
-                                                    value={loginData.name}
-                                                    onChange={handleChange}
-                                                    placeholder="กรอกชื่อ-นามสกุล"
-                                                    required
-                                                    style={{
-                                                        padding: '0.75rem',
-                                                        borderRadius: '10px',
-                                                        border: '2px solid #e2e8f0',
-                                                        transition: 'all 0.3s ease'
-                                                    }}
-                                                />
-                                            </div>
-                                            <div className="mb-4">
-                                                <label className="form-label" style={{fontWeight: '500'}}>
                                                     อีเมล <span className="text-danger">*</span>
                                                 </label>
                                                 <input
@@ -226,7 +205,7 @@ function LoginCustomer() {
                                                 </small>
                                             </div>
                                             <div className="text-muted mb-4 small">
-                                                * หากเป็นครั้งแรกที่ใช้งาน ระบบจะสร้างบัญชีลูกค้าให้อัตโนมัติ
+                                                * กรุณากรอกข้อมูลให้ครบทุกช่อง
                                             </div>
                                             <button 
                                                 type="submit" 

@@ -139,7 +139,7 @@ router.post("/customer", service.isLogin, async (req, res) => {
 // route สำหรับ login ลูกค้า
 router.post("/login/customer", async (req, res) => {
     try {
-        const { email, phone, name } = req.body;
+        const { email, phone } = req.body;
         
         if (!email || !phone) {
             return res.status(400).json({ 
@@ -148,30 +148,18 @@ router.post("/login/customer", async (req, res) => {
             });
         }
 
-        let customer = await CustomerModel.findOne({
+        const customer = await CustomerModel.findOne({
             where: { 
                 email: email,
                 phone: phone
             }
         });
 
-        // ถ้าไม่พบลูกค้า ให้สร้างลูกค้าใหม่
         if (!customer) {
-            // สร้างรหัสลูกค้าใหม่
-            const newCustomerId = await generateCustomerId();
-            
-            const customerData = {
-                idcustomers: newCustomerId,
-                name: name || 'ลูกค้าใหม่', // ใช้ชื่อที่ส่งมาหรือชื่อเริ่มต้น
-                email: email,
-                phone: phone,
-                points: 0,
-                membershipTier: 'NORMAL',
-                pointsExpireDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-                totalSpent: 0
-            };
-
-            customer = await CustomerModel.create(customerData);
+            return res.status(404).json({ 
+                success: false, 
+                message: "ไม่พบข้อมูลลูกค้าหรือข้อมูลไม่ถูกต้อง" 
+            });
         }
 
         res.json({ 
