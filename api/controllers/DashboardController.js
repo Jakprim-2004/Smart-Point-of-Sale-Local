@@ -18,8 +18,7 @@ router.post("/reportSumSalePerMonth", async (req, res) => {
     const { year, month, viewType } = req.body;
     const userId = service.getMemberId(req);
     
-    console.log('=== REPORT SUM SALE PER MONTH DEBUG ===');
-    console.log('Request params:', { year, month, viewType, userId });
+    
     
     // กำหนดค่าสำหรับมุมมองรายวันหรือรายเดือน
     const dateUnit = viewType === "daily" ? "DAY" : "MONTH";
@@ -512,8 +511,7 @@ router.get('/reportTodaySales', async (req, res) => {
 router.get('/todaySalesReport', async (req, res) => {
   try {
     const userId = service.getMemberId(req);
-    console.log('=== TODAY SALES REPORT GET DEBUG ===');
-    console.log('User ID:', userId);
+ 
     
     // ใช้เวลาไทยปัจจุบันโดยตรง (UTC+7)
     const now = new Date();
@@ -521,9 +519,7 @@ router.get('/todaySalesReport', async (req, res) => {
     // สร้างวันที่ในไทยโดยใช้ toLocaleString แทน
     const thaiDateStr = now.toLocaleString("en-CA", {timeZone: "Asia/Bangkok"}).split(',')[0]; // รูปแบบ YYYY-MM-DD
     
-    console.log('Now UTC:', now);
-    console.log('Thai date string:', thaiDateStr);
-    console.log('Searching for date:', thaiDateStr);
+  
 
     // First, let's see what bills exist for this user in the last few days
     const allRecentBills = await BillSaleModel.findAll({
@@ -536,22 +532,17 @@ router.get('/todaySalesReport', async (req, res) => {
       limit: 10
     });
 
-    console.log('=== ALL RECENT BILLS FOR USER ===');
     allRecentBills.forEach(bill => {
       const thaiDate = new Date(bill.payDate).toLocaleString("en-CA", {timeZone: "Asia/Bangkok"}).split(',')[0];
-      console.log(`Bill ${bill.id}: payDate=${bill.payDate}, Thai date=${thaiDate}, amount=${bill.totalAmount}`);
     });
 
-    console.log('=== SEARCHING FOR TODAY BILLS ===');
-    console.log('Query date:', thaiDateStr);
+  
     
     // Create date range for the entire day in Thai timezone
     const startOfDay = new Date(thaiDateStr + 'T00:00:00+07:00');
     const endOfDay = new Date(thaiDateStr + 'T23:59:59+07:00');
     
-    console.log('Start of day:', startOfDay);
-    console.log('End of day:', endOfDay);
-    
+   
     const todaySales = await BillSaleModel.findAll({
       where: {
         userId: userId,
@@ -561,24 +552,14 @@ router.get('/todaySalesReport', async (req, res) => {
           [sequelize.Op.lte]: endOfDay
         }
       },
-      logging: console.log // This will show the actual SQL query
     });
 
-    console.log('Found TODAY bills:', todaySales.length);
-    if (todaySales.length > 0) {
-      console.log('Today bills:', todaySales.map(bill => ({
-        id: bill.id,
-        payDate: bill.payDate,
-        totalAmount: bill.totalAmount
-      })));
-    }
 
     // Calculate yesterday date for comparison
     const yesterday = new Date(thaiDateStr);
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayStr = yesterday.toISOString().split('T')[0];
     
-    console.log('Yesterday date string:', yesterdayStr);
     
     // Create date range for yesterday
     const startOfYesterday = new Date(yesterdayStr + 'T00:00:00+07:00');
@@ -651,9 +632,7 @@ router.post('/todaySalesReport', async (req, res) => {
     const userId = service.getMemberId(req);
     const { date } = req.body;
     
-    console.log('=== TODAY SALES REPORT DEBUG ===');
-    console.log('User ID:', userId);
-    console.log('Date param:', date);
+
     
     let targetDate;
     if (date) {
@@ -666,8 +645,7 @@ router.post('/todaySalesReport', async (req, res) => {
       // สร้างวันที่ในไทยโดยใช้ toLocaleString แทน
       const thaiDateStr = now.toLocaleString("en-CA", {timeZone: "Asia/Bangkok"}).split(',')[0]; // รูปแบบ YYYY-MM-DD
       targetDate = new Date(thaiDateStr + 'T00:00:00.000Z');
-      console.log('Thai date string:', thaiDateStr);
-      console.log('Target date (Thai timezone):', targetDate);
+   
     }
     
     const previousDay = new Date(targetDate);
@@ -690,12 +668,7 @@ router.post('/todaySalesReport', async (req, res) => {
       }
     });
 
-    console.log('Found bills for target date:', targetSales.length);
-    console.log('Bills:', targetSales.map(bill => ({
-      id: bill.id,
-      payDate: bill.payDate,
-      totalAmount: bill.totalAmount
-    })));
+  
 
     const previousSales = await BillSaleModel.findAll({
       where: {
@@ -793,7 +766,6 @@ router.get('/yesterdaySalesReport', async (req, res) => {
       }
     });
 
-    console.log('Found YESTERDAY bills:', yesterdaySales.length);
 
     const twoDaysAgoSales = await BillSaleModel.findAll({
       where: {

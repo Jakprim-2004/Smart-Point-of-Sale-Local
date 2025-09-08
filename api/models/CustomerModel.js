@@ -7,6 +7,11 @@ const CustomerModel = conn.define("Customer", {
         primaryKey: true,
         autoIncrement: true
     },
+    idcustomers: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        unique: true
+    },
     name: {
         type: DataTypes.STRING(100),
         allowNull: false

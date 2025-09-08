@@ -43,7 +43,8 @@ function Customer() {
         const filtered = customers.filter(customer =>
             customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             customer.phone.includes(searchTerm) ||
-            customer.email?.toLowerCase().includes(searchTerm.toLowerCase())
+            customer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (customer.idcustomers && customer.idcustomers.toString().includes(searchTerm))
         );
 
         setFilteredCustomers(filtered);
@@ -212,7 +213,7 @@ function Customer() {
                                 <input
                                     type="text"
                                     className="form-control"
-                                    placeholder="ค้นหาลูกค้า (ชื่อ, เบอร์โทร, อีเมล)"
+                                    placeholder="ค้นหาลูกค้า (รหัสลูกค้า, ชื่อ, เบอร์โทร, อีเมล)"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
@@ -287,6 +288,7 @@ function Customer() {
                         <thead>
                             <tr>
                                 <th width="80px">ลำดับ</th>
+                                <th>รหัสลูกค้า</th>
                                 <th>ชื่อ</th>
                                 <th>เบอร์โทร</th>
                                 <th>อีเมล</th>
@@ -300,6 +302,9 @@ function Customer() {
                                 <tr key={customer.id}>
                                     <td className="text-center fw-bold text-primary">
                                         {startIndex + index + 1}
+                                    </td>
+                                    <td className="text-center fw-bold text-info">
+                                        {customer.idcustomers || 'ไม่มีรหัส'}
                                     </td>
                                     <td>
                                         {editCustomer?.id === customer.id ? (

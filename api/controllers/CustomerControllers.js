@@ -80,6 +80,20 @@ router.put("/customer/:id", service.isLogin, async (req, res) => {
     }
 });
 
+// ฟังก์ชันสร้างรหัสลูกค้าอัตโนมัติ
+const generateCustomerId = async () => {
+    // สร้างรหัสลูกค้า 6 หลัก เริ่มจาก 100001
+    const lastCustomer = await CustomerModel.findOne({
+        order: [['idcustomers', 'DESC']]
+    });
+    
+    if (lastCustomer && lastCustomer.idcustomers) {
+        return lastCustomer.idcustomers + 1;
+    } else {
+        return 100001; // เริ่มต้นที่ 100001
+    }
+};
+
 // สร้างลูกค้าใหม่
 router.post("/customer", service.isLogin, async (req, res) => {
     try {
@@ -97,8 +111,12 @@ router.post("/customer", service.isLogin, async (req, res) => {
             return res.status(400).json({ error: "เบอร์โทรศัพท์นี้มีในระบบแล้ว" });
         }
 
+        // สร้างรหัสลูกค้าใหม่
+        const newCustomerId = await generateCustomerId();
+
         const customerData = {
             ...req.body,
+            idcustomers: newCustomerId, // เพิ่มรหัสลูกค้า
             user_id: userId,
             points: 0,
             membershipTier: 'NORMAL',
@@ -121,7 +139,7 @@ router.post("/customer", service.isLogin, async (req, res) => {
 // route สำหรับ login ลูกค้า
 router.post("/login/customer", async (req, res) => {
     try {
-        const { email, phone } = req.body;
+        const { email, phone, name } = req.body;
         
         if (!email || !phone) {
             return res.status(400).json({ 
@@ -130,18 +148,30 @@ router.post("/login/customer", async (req, res) => {
             });
         }
 
-        const customer = await CustomerModel.findOne({
+        let customer = await CustomerModel.findOne({
             where: { 
                 email: email,
                 phone: phone
             }
         });
 
+        // ถ้าไม่พบลูกค้า ให้สร้างลูกค้าใหม่
         if (!customer) {
-            return res.status(404).json({ 
-                success: false, 
-                message: "ไม่พบข้อมูลลูกค้าหรือข้อมูลไม่ถูกต้อง" 
-            });
+            // สร้างรหัสลูกค้าใหม่
+            const newCustomerId = await generateCustomerId();
+            
+            const customerData = {
+                idcustomers: newCustomerId,
+                name: name || 'ลูกค้าใหม่', // ใช้ชื่อที่ส่งมาหรือชื่อเริ่มต้น
+                email: email,
+                phone: phone,
+                points: 0,
+                membershipTier: 'NORMAL',
+                pointsExpireDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+                totalSpent: 0
+            };
+
+            customer = await CustomerModel.create(customerData);
         }
 
         res.json({ 

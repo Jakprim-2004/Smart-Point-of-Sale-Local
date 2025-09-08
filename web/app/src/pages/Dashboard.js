@@ -174,7 +174,7 @@ function Dashboard() {
             weight: '400'
           },
           callback: function (value) {
-            return '฿' + Math.floor(parseFloat(value)).toLocaleString('th-TH');
+            return  + Math.floor(parseFloat(value)).toLocaleString('th-TH')+" บาท";
           },
           stepSize: 1,
           maxTicksLimit: 8,
@@ -613,7 +613,7 @@ function Dashboard() {
                         weight: '400'
                       },
                       callback: function (value) {
-                        return '฿' + Math.floor(value).toLocaleString('th-TH');
+                        return  Math.floor(value).toLocaleString('th-TH') + " บาท";
                       }
                     },
                     title: {
@@ -1159,7 +1159,7 @@ function Dashboard() {
                           endDate={dateRangeValue[1]}
                           onChange={(update) => setDateRangeValue(update)}
                           dateFormat="dd/MM/yyyy"
-                          isClearable={true}
+                          isClearable={false}
                           placeholderText="เลือกช่วงวันที่..."
                           showMonthDropdown
                           showYearDropdown
@@ -1167,7 +1167,6 @@ function Dashboard() {
                           maxDate={new Date()}
                           monthsShown={1}
                           todayButton="🏠 วันนี้"
-                          clearButtonTitle="ล้างข้อมูล"
                           calendarStartDay={0}
                           popperPlacement="bottom-start"
                           withPortal
@@ -1376,7 +1375,7 @@ function Dashboard() {
                                   return context[0].label;
                                 },
                                 label: function (context) {
-                                  return `กำไรสุทธิ: ฿${formatNumber(context.raw)}`;
+                                  return `กำไรสุทธิ: ${formatNumber(context.raw)} บาท`;
                                 }
                               }
                             }
@@ -1400,7 +1399,7 @@ function Dashboard() {
                                   weight: '400'
                                 },
                                 callback: function (value) {
-                                  return '฿' + Math.floor(value).toLocaleString('th-TH');
+                                  return  Math.floor(value).toLocaleString('th-TH')+ ' บาท';
                                 }
                               },
                               title: {

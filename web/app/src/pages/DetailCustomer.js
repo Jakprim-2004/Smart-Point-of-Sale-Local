@@ -272,6 +272,7 @@ function DetailCustomer() {
                 <div className="card-body">
                     <div className="row">
                         <div className="col-md-6">
+                            <p><strong>รหัสลูกค้า:</strong> {customer.idcustomers || 'ไม่มีรหัส'}</p>
                             <p><strong>ชื่อ:</strong> {customer.name}</p>
                             <p><strong>เบอร์โทร:</strong> {customer.phone}</p>
                             <p><strong>อีเมล:</strong> {customer.email || '-'}</p>
