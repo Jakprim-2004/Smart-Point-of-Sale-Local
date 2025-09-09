@@ -18,7 +18,7 @@ function BillSales() {
   const [showBillDetailModal, setShowBillDetailModal] = useState(false);
   const [itemsPerPage] = useState(30);
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [sortBy, setSortBy] = useState("id"); 
   useEffect(() => {
     fetchData();
   }, []);
@@ -57,28 +57,73 @@ function BillSales() {
     // กรองตามช่วงวันที่
     if (startDate && endDate) {
       filtered = filtered.filter(bill => {
-        // แยกวันที่จาก ISO string โดยตรง
         const isoString = bill.payDate;
+        if (!isoString) return false; // ตรวจสอบว่ามี payDate
+
         const [datePart] = isoString.split('T');
         const [year, month, day] = datePart.split('-');
         const billDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-        
+
         const start = new Date(startDate);
         start.setHours(0, 0, 0, 0);
         const end = new Date(endDate);
         end.setHours(23, 59, 59, 999);
-        
+
         return billDate >= start && billDate <= end;
       });
     }
 
+    // เรียงลำดับ
+    filtered.sort((a, b) => {
+      if (sortBy === "id") {
+        return a.id - b.id; // เรียงตามเลขบิล
+      } else if (sortBy === "payDate") {
+        return new Date(a.payDate) - new Date(b.payDate); // เรียงตามวันที่
+      }
+      return 0;
+    });
+
     setFilteredBills(filtered);
-  }, [billSales, searchBillNo, startDate, endDate]);
+  }, [billSales, searchBillNo, startDate, endDate, sortBy]);
 
   useEffect(() => {
     filterBills();
     setCurrentPage(1); // รีเซ็ตหน้าเมื่อมีการกรองข้อมูล
   }, [filterBills]);
+
+  const formatDateTime = (isoString) => {
+    if (!isoString) return '';
+    
+    // แปลงจาก ISO string เป็น Date object
+    const date = new Date(isoString);
+    
+    // ดึงข้อมูลวันที่และเวลาตามเขตเวลาไทย
+    const options = { 
+      timeZone: 'Asia/Bangkok',
+      year: 'numeric',
+      month: 'numeric', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    };
+    
+    const formatter = new Intl.DateTimeFormat('en-US', options);
+    const parts = formatter.formatToParts(date);
+    
+    const day = parts.find(part => part.type === 'day').value;
+    const month = parts.find(part => part.type === 'month').value;
+    const year = parts.find(part => part.type === 'year').value;
+    const hour = parts.find(part => part.type === 'hour').value;
+    const minute = parts.find(part => part.type === 'minute').value;
+    
+    const months = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+                   'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+    
+    const monthName = months[parseInt(month) - 1];
+    const thaiYear = parseInt(year) + 543;
+    
+    return `${parseInt(day)} ${monthName} ${thaiYear} เวลา ${hour}:${minute}`;
+  };
 
   return (
     <>
@@ -126,6 +171,8 @@ function BillSales() {
                 </div>
               </div>
 
+            
+
               <div className="table-responsive">
                 <table className="table table-hover border">
                   <thead className="bg-light">
@@ -149,21 +196,7 @@ function BillSales() {
                               <td className="fw-bold text-secondary">{startIndex + index + 1}</td>
                               <td className="fw-bold text-primary">{item.id}</td>
                               <td>
-                                {(() => {
-                                  // แยกวันที่และเวลาจาก ISO string โดยตรง ไม่ให้ JavaScript แปลง timezone
-                                  const isoString = item.payDate;
-                                  const [datePart, timePart] = isoString.split('T');
-                                  const [year, month, day] = datePart.split('-');
-                                  const [hour, minute] = timePart.split(':');
-                                  
-                                  const months = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
-                                                 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
-                                  
-                                  const thaiYear = parseInt(year) + 543;
-                                  const monthName = months[parseInt(month) - 1];
-                                  
-                                  return `${parseInt(day)} ${monthName} ${thaiYear} เวลา ${hour}:${minute}`;
-                                })()}
+                                {formatDateTime(item.payDate)}
                               </td>
                               <td className="#">
                                 <button
@@ -277,21 +310,7 @@ function BillSales() {
                 <div className="card-body p-3">
                   <h6 className="text-muted mb-2">วันที่ออกบิล</h6>
                   <p className="mb-0">
-                    {selectBill?.payDate && (() => {
-                      // แยกวันที่และเวลาจาก ISO string โดยตรง ไม่ให้ JavaScript แปลง timezone
-                      const isoString = selectBill.payDate;
-                      const [datePart, timePart] = isoString.split('T');
-                      const [year, month, day] = datePart.split('-');
-                      const [hour, minute] = timePart.split(':');
-                      
-                      const months = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
-                                     'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
-                      
-                      const thaiYear = parseInt(year) + 543;
-                      const monthName = months[parseInt(month) - 1];
-                      
-                      return `${parseInt(day)} ${monthName} ${thaiYear} เวลา ${hour}:${minute}`;
-                    })()}
+                    {selectBill?.payDate && formatDateTime(selectBill.payDate)}
                   </p>
                 </div>
               </div>

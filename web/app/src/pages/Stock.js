@@ -17,7 +17,7 @@ function Stock() {
   const [lowStockThreshold, setLowStockThreshold] = useState(10); // เกณฑ์สินค้าเหลือน้อย
   
   // Pagination states
-  const [currentPage, setCurrentPage] = useState();
+  const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(30);
 
   // ฟังก์ชันจัดรูปแบบเงินด้วยเครื่องหมายจุลภาค

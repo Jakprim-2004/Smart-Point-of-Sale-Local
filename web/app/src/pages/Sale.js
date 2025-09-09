@@ -2502,9 +2502,9 @@ function Sale() {
 
           {/* Bill Info */}
           <div style={{ marginBottom: "8px" }}>
-            {(lastBill?.Customer?.name || memberInfo?.name) && (
+            {(lastBill?.Customer?.idcustomers || memberInfo?.idcustomers) && (
               <div>
-                ชื่อลูกค้า: {lastBill?.Customer?.name || memberInfo?.name}
+                รหัสลูกค้า: {lastBill?.Customer?.idcustomers || memberInfo?.idcustomers}
               </div>
             )}
             <div>

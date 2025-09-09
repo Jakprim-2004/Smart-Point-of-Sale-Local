@@ -341,7 +341,7 @@ app.get('/billSale/lastBill', service.isLogin, async (req, res) => {
                 },
                 {
                     model: CustomerModel,
-                    attributes: [ 'name']
+                    attributes: ['idcustomers', 'name']
                 }
             ]
         });

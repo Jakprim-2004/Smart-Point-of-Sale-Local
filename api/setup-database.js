@@ -24,9 +24,9 @@ async function setupDatabase() {
         await sequelize.authenticate();
         console.log('✅ Database connection successful');
         
-        // สร้างตารางใหม่หมด
-        await sequelize.sync({ force: true });
-        console.log('✅ All tables created successfully');
+        // อัปเดตตารางที่ยังไม่มีหรือเปลี่ยนแปลงโครงสร้างตารางที่มีอยู่
+        await sequelize.sync({ alter: true });
+        console.log('✅ Tables updated successfully');
         
         // แสดงรายชื่อตาราง
         const [results] = await sequelize.query(`

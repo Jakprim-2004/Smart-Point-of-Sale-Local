@@ -47,7 +47,14 @@ function Customer() {
             (customer.idcustomers && customer.idcustomers.toString().includes(searchTerm))
         );
 
-        setFilteredCustomers(filtered);
+        // เรียงลำดับผลลัพธ์การค้นหาตาม ID ลูกค้า
+        const sortedFiltered = filtered.sort((a, b) => {
+            const idA = parseInt(a.idcustomers) || 0;
+            const idB = parseInt(b.idcustomers) || 0;
+            return idA - idB;
+        });
+
+        setFilteredCustomers(sortedFiltered);
         setCurrentPage(1);
     };
 
@@ -77,12 +84,14 @@ function Customer() {
             const response = await axios.get(
                 config.api_path + "/customers", 
                 config.headers()
-            ); // เพิ่ม config.headers()
+            ); 
             if (response.data.result) {
-                // เรียงลูกค้าตามชื่อ ก-ฮ
                 const sortedCustomers = response.data.result.sort((a, b) => {
-                    return a.name.localeCompare(b.name, 'th', { numeric: true });
+                    const idA = parseInt(a.idcustomers) || 0;
+                    const idB = parseInt(b.idcustomers) || 0;
+                    return idA - idB;
                 });
+                
                 setCustomers(sortedCustomers);
                 setFilteredCustomers(sortedCustomers);
             }
