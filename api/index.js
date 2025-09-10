@@ -20,7 +20,14 @@ app.use("/uploads", express.static("uploads"));
 
 
 
-
+app.get('/', (req, res) => {
+  res.json({ message: 'Welcome to Smart POS API' });
+  try {
+    console.log('Root endpoint accessed');
+  } catch (error) {
+    console.error('Error in root endpoint:', error);
+  }
+});
 
 
 

@@ -762,7 +762,7 @@ function Dashboard() {
                 {dailyViewMode === 'today' 
                   ? todaySales.billCount
                   : todaySales.yesterdayBillCount
-                }
+                } บิล
               </div>
               <div className="comparison-text mt-3">
                 <i className="fas fa-receipt me-2"></i>
@@ -979,7 +979,7 @@ function Dashboard() {
                 <div className="summary-card-header" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
                   <div className="d-flex align-items-center">
                     <i className="fas fa-chart-line me-2"></i>
-                    ยอดขายทั้งหมด(บาท)
+                    ยอดขายทั้งหมด (บาท)
                   </div>
                 </div>
                 <div className="summary-card-body">
@@ -992,7 +992,7 @@ function Dashboard() {
                 <div className="summary-card-header" style={{ background: 'linear-gradient(135deg, #ffa726 0%, #ff7043 100%)' }}>
                   <div className="d-flex align-items-center">
                     <i className="fas fa-coins me-2"></i>
-                    ต้นทุนรวม(บาท)
+                    ต้นทุนรวม (บาท)
                   </div>
                 </div>
                 <div className="summary-card-body">
@@ -1005,7 +1005,7 @@ function Dashboard() {
                 <div className="summary-card-header" style={{ background: 'linear-gradient(135deg, #66bb6a 0%, #43a047 100%)' }}>
                   <div className="d-flex align-items-center">
                     <i className="fas fa-trophy me-2"></i>
-                    กำไรสุทธิ(บาท)
+                    กำไรสุทธิ (บาท)
                   </div>
                 </div>
                 <div className="summary-card-body">
