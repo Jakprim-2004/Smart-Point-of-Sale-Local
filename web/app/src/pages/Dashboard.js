@@ -614,8 +614,7 @@ function Dashboard() {
                         weight: '400'
                       },
                       callback: function (value) {
-                        const num = parseFloat(value) || 0;
-                        return Math.floor(num).toLocaleString('th-TH') + " บาท";
+                        return  Math.floor(value).toLocaleString('th-TH') + " บาท";
                       }
                     },
                     title: {
@@ -662,8 +661,7 @@ function Dashboard() {
   };
 
   const formatNumber = (num) => {
-    const number = Number(num);
-    return isNaN(number) ? "0" : number.toLocaleString("th-TH");
+    return Number(num).toLocaleString("th-TH");
   };
 
   const chartContainerStyle = {
@@ -735,15 +733,15 @@ function Dashboard() {
               </div>
               <div className="metric-number">
                 {dailyViewMode === 'today' 
-                  ? (todaySales.totalAmount || 0).toLocaleString()
-                  : (todaySales.yesterdayTotal || 0).toLocaleString()
+                  ? todaySales.totalAmount.toLocaleString()
+                  : todaySales.yesterdayTotal.toLocaleString()
                 } บาท
               </div>
               <div className="comparison-text mt-3">
                 <i className="fas fa-chart-line me-2"></i>
                 {dailyViewMode === 'today' 
-                  ? `เมื่อวาน: ${(todaySales.yesterdayTotal || 0).toLocaleString()} บาท`
-                  : `วันนี้: ${(todaySales.totalAmount || 0).toLocaleString()} บาท`
+                  ? `เมื่อวาน: ${todaySales.yesterdayTotal.toLocaleString()} บาท`
+                  : `วันนี้: ${todaySales.totalAmount.toLocaleString()} บาท`
                 }
               </div>
             </div>
@@ -785,15 +783,15 @@ function Dashboard() {
               <div className="metric-label mb-2">ค่าเฉลี่ยต่อบิล</div>
               <div className="metric-number">
                 {dailyViewMode === 'today' 
-                  ? (todaySales.averagePerBill || 0).toLocaleString()
-                  : (todaySales.yesterdayAveragePerBill || 0).toLocaleString()
+                  ? todaySales.averagePerBill.toLocaleString()
+                  : todaySales.yesterdayAveragePerBill.toLocaleString()
                 } บาท
               </div>
               <div className="comparison-text mt-3">
                 <i className="fas fa-calculator me-2"></i>
                 {dailyViewMode === 'today' 
-                  ? `เมื่อวาน: ${(todaySales.yesterdayAveragePerBill || 0).toLocaleString()} บาท`
-                  : `วันนี้: ${(todaySales.averagePerBill || 0).toLocaleString()} บาท`
+                  ? `เมื่อวาน: ${todaySales.yesterdayAveragePerBill.toLocaleString()} บาท`
+                  : `วันนี้: ${todaySales.averagePerBill.toLocaleString()} บาท`
                 }
               </div>
             </div>
@@ -863,7 +861,7 @@ function Dashboard() {
                           <div className="row align-items-center">
                             <div className="col-8">
                               <h6 className="mb-1 fw-bold text-dark">{itemName}</h6>
-                              <small className="text-muted">{(amount || 0).toLocaleString('th-TH')} บาท</small>
+                              <small className="text-muted">{amount.toLocaleString('th-TH')} บาท</small>
                             </div>
                             <div className="col-4 text-end">
                               <div className="fw-bold text-success" style={{ fontSize: '1.2rem' }}>
@@ -944,7 +942,7 @@ function Dashboard() {
                                   {stat.paymentMethod}
                                 </h5>
                                 <div className="fw-bold text-dark mb-3" style={{ fontSize: '1.6rem' }}>
-                                  {(amount || 0).toLocaleString('th-TH')} บาท
+                                  {amount.toLocaleString('th-TH')} บาท
                                 </div>
                                 <div className="d-flex justify-content-between align-items-center">
                                   <span className="text-muted" style={{ fontSize: '1rem' }}>{stat.count || 0} รายการ</span>
@@ -1402,8 +1400,7 @@ function Dashboard() {
                                   weight: '400'
                                 },
                                 callback: function (value) {
-                                  const num = parseFloat(value) || 0;
-                                  return Math.floor(num).toLocaleString('th-TH') + ' บาท';
+                                  return  Math.floor(value).toLocaleString('th-TH')+ ' บาท';
                                 }
                               },
                               title: {
@@ -1822,15 +1819,15 @@ function Dashboard() {
         .thai-datepicker-input {
           display: flex !important;
           align-items: center !important;
-          background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(248,250,252,0.95)) !important;
-          border: 2px solid rgba(102, 126, 234, 0.2) !important;
-          border-radius: 15px !important;
-          padding: 16px 20px !important;
+          background: #ffffff !important;
+          border: 1px solid #E7E9EE !important;
+          border-radius: 10px !important;
+          padding: 8px 10px !important;
           cursor: pointer !important;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-          min-width: 280px !important;
+          transition: all 0.2s ease !important;
+          min-width: 80px !important;
           position: relative !important;
-          box-shadow: 0 4px 20px rgba(102, 126, 234, 0.08) !important;
+          box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04) !important;
           overflow: hidden !important;
         }
 
@@ -1852,29 +1849,31 @@ function Dashboard() {
         }
 
         .thai-datepicker-input:hover {
-          border-color: #2563eb !important;
-          background: rgba(255,255,255,1) !important;
-          box-shadow: 0 8px 30px rgba(37, 99, 235, 0.15) !important;
-          transform: translateY(-2px) !important;
+          border-color: rgba(37, 99, 235, 0.25) !important;
+          background: #ffffff !important;
+          box-shadow: 0 3px 12px rgba(16, 24, 40, 0.06) !important;
+          transform: none !important;
         }
 
         .thai-datepicker-input:focus-within {
           border-color: #2563eb !important;
-          box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15), 0 8px 30px rgba(37, 99, 235, 0.2) !important;
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
         }
 
         .input-icon {
-          background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
-          color: white !important;
-          width: 45px !important;
-          height: 45px !important;
-          border-radius: 12px !important;
+          background: #eef3ff !important;
+          color: #2563eb !important;
+          width: 28px !important;
+          height: 28px !important;
+          border-radius: 8px !important;
           display: flex !important;
           align-items: center !important;
           justify-content: center !important;
-          margin-right: 15px !important;
-          box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3) !important;
-          transition: all 0.3s ease !important;
+          margin-right: 8px !important;
+          border: 1px solid #d6e0ff !important;
+          box-shadow: none !important;
+          transition: all 0.2s ease !important;
+          font-size: 0.85rem !important;
         }
 
         .thai-datepicker-input:hover .input-icon {
@@ -1890,7 +1889,7 @@ function Dashboard() {
         }
 
         .input-label {
-          font-size: 12px !important;
+          font-size: 10px !important;
           font-weight: 600 !important;
           color: #667eea !important;
           text-transform: uppercase !important;
@@ -1899,7 +1898,7 @@ function Dashboard() {
         }
 
         .input-value {
-          font-size: 14px !important;
+          font-size: 12px !important;
           font-weight: 500 !important;
           color: #333 !important;
           line-height: 1.4 !important;
@@ -2470,6 +2469,75 @@ function Dashboard() {
             line-height: 35px !important;
             margin: 2px !important;
           }
+        }
+
+        /* ===================
+           Minimal DatePicker
+           =================== */
+        .react-datepicker {
+          background: #ffffff !important;
+          border: 1px solid #e6e8eb !important;
+          border-radius: 12px !important;
+          box-shadow: 0 6px 20px rgba(0,0,0,0.08) !important;
+        }
+
+        .react-datepicker__header {
+          background: #ffffff !important;
+          color: #1a1a1a !important;
+          border-bottom: 1px solid #edf0f3 !important;
+          padding: 14px 16px !important;
+        }
+
+        .react-datepicker__current-month,
+        .react-datepicker__day-name {
+          color: #2b2f38 !important;
+          text-shadow: none !important;
+        }
+
+        .react-datepicker__day {
+          background: transparent !important;
+          border-radius: 8px !important;
+          color: #2b2f38 !important;
+        }
+
+        .react-datepicker__day:hover {
+          background: #f3f6f9 !important;
+          transform: none !important;
+          box-shadow: none !important;
+        }
+
+        .react-datepicker__day--selected,
+        .react-datepicker__day--keyboard-selected {
+          background: #2563eb !important;
+          color: #ffffff !important;
+          border: none !important;
+        }
+
+        .react-datepicker__navigation {
+          background: transparent !important;
+          border: none !important;
+          width: 36px !important;
+          height: 36px !important;
+          border-radius: 8px !important;
+        }
+
+        .react-datepicker__navigation:hover {
+          background: #f3f6f9 !important;
+        }
+
+        .react-datepicker__time-container {
+          border-left: 1px solid #edf0f3 !important;
+        }
+
+        .react-datepicker__time-list-item--selected {
+          background: #2563eb !important;
+          color: #ffffff !important;
+        }
+
+        /* Footer buttons inside custom CalendarContainer */
+        .react-datepicker + div button.btn {
+          border-radius: 8px;
+          padding: 8px 14px;
         }
       `}</style>
     </Template>

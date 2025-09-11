@@ -192,9 +192,11 @@ router.get('/reportStock', async (req, res) => {
 router.get('/reportTopSellingProducts', async (req, res) => {
   try {
     const userId = service.getMemberId(req); 
-    // ใช้เวลาไทยปัจจุบันโดยตรง
+    // ขอบเขตเวลาไทยสำหรับ ณ วันปัจจุบัน
     const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const thaiDateStr = now.toLocaleString('en-CA', { timeZone: 'Asia/Bangkok' }).split(',')[0];
+    const startOfDay = new Date(thaiDateStr + 'T00:00:00+07:00');
+    const endOfDay = new Date(thaiDateStr + 'T23:59:59+07:00');
 
     // Get product info first
     const products = await ProductModel.findAll({
@@ -211,23 +213,16 @@ router.get('/reportTopSellingProducts', async (req, res) => {
       });
     });
 
-    // Get all paid billSales for today - ใช้ payDate ที่แปลงเป็นเวลาไทยและรองรับ timezone
+    // Get all paid billSales for today (ช่วงเวลาไทย ณ วันปัจจุบัน)
     const paidBills = await BillSaleModel.findAll({
       attributes: ['id'],
       where: {
         userId: userId,
         status: 'pay',
-        // ใช้ DATE function กับ timezone conversion ที่ชัดเจน
-        [sequelize.Op.and]: [
-          sequelize.where(
-            sequelize.fn('DATE', 
-              sequelize.fn('TIMEZONE', 'Asia/Bangkok', 
-                sequelize.fn('TIMEZONE', 'UTC', sequelize.col('payDate'))
-              )
-            ), 
-            sequelize.fn('DATE', today)
-          )
-        ]
+        payDate: {
+          [sequelize.Op.gte]: startOfDay,
+          [sequelize.Op.lte]: endOfDay
+        }
       },
       raw: true
     });
@@ -314,9 +309,11 @@ router.get('/reportTopSellingProducts', async (req, res) => {
 router.get('/reportTopSellingCategories', async (req, res) => {
   try {
     const userId = service.getMemberId(req); 
-    // ใช้เวลาไทยปัจจุบันโดยตรง
+    // ขอบเขตเวลาไทยสำหรับ ณ วันปัจจุบัน
     const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const thaiDateStr = now.toLocaleString('en-CA', { timeZone: 'Asia/Bangkok' }).split(',')[0];
+    const startOfDay = new Date(thaiDateStr + 'T00:00:00+07:00');
+    const endOfDay = new Date(thaiDateStr + 'T23:59:59+07:00');
 
    
     const topSellingCategories = await BillSaleDetailModel.findAll({
@@ -340,16 +337,7 @@ router.get('/reportTopSellingCategories', async (req, res) => {
         where: { 
           status: 'pay',
           userId: userId,
-          [sequelize.Op.and]: [
-            sequelize.where(
-              sequelize.fn('DATE', 
-                sequelize.fn('TIMEZONE', 'Asia/Bangkok', 
-                  sequelize.fn('TIMEZONE', 'UTC', sequelize.col('billSale.payDate'))
-                )
-              ), 
-              sequelize.fn('DATE', today)
-            )
-          ]
+          payDate: { [sequelize.Op.between]: [startOfDay, endOfDay] }
         },
         required: true 
       }],
@@ -837,9 +825,11 @@ router.get('/yesterdaySalesReport', async (req, res) => {
 router.get('/paymentMethodStats', async (req, res) => {
   try {
     const userId = service.getMemberId(req);
-    // ใช้เวลาไทยปัจจุบันโดยตรง
+    // ขอบเขตเวลาไทยสำหรับ ณ วันปัจจุบัน
     const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const thaiDateStr = now.toLocaleString('en-CA', { timeZone: 'Asia/Bangkok' }).split(',')[0];
+    const startOfDay = new Date(thaiDateStr + 'T00:00:00+07:00');
+    const endOfDay = new Date(thaiDateStr + 'T23:59:59+07:00');
 
     const paymentStats = await BillSaleModel.findAll({
       attributes: [
@@ -850,16 +840,7 @@ router.get('/paymentMethodStats', async (req, res) => {
       where: {
         userId: userId,
         status: 'pay',
-        [sequelize.Op.and]: [
-          sequelize.where(
-            sequelize.fn('DATE', 
-              sequelize.fn('TIMEZONE', 'Asia/Bangkok', 
-                sequelize.fn('TIMEZONE', 'UTC', sequelize.col('payDate'))
-              )
-            ), 
-            sequelize.fn('DATE', today)
-          )
-        ]
+        payDate: { [sequelize.Op.between]: [startOfDay, endOfDay] }
       },
       group: ['paymentMethod'],
       raw: true
