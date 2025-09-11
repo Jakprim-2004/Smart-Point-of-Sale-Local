@@ -95,7 +95,7 @@ function Dashboard() {
   // Add states for product details section
   const [dateRange, setDateRange] = useState("today");
   const [dateRangeValue, setDateRangeValue] = useState([null, null]);
-  const [showSold, setShowSold] = useState(true);
+  const [showSold] = useState(true);
   const [combinedStockData, setCombinedStockData] = useState([]);
 
   // เพิ่มฟังก์ชันสำหรับแสดงชื่อเดือนภาษาไทย
@@ -174,7 +174,7 @@ function Dashboard() {
             weight: '400'
           },
           callback: function (value) {
-            return  + Math.floor(parseFloat(value)).toLocaleString('th-TH')+" บาท";
+            return Math.floor(parseFloat(value) || 0).toLocaleString('th-TH') + " บาท";
           },
           stepSize: 1,
           maxTicksLimit: 8,
@@ -248,35 +248,37 @@ function Dashboard() {
       const payload = { year, month, viewType };
       const res = await axios.post(url, payload, config.headers());
 
-      if (res.data.message === "success") {
-        const results = res.data.results || [];
-        
-        let salesData = [],
-          profitData = [],
-          costData = [];
+        if (res.data.message === "success") {
+          const results = res.data.results || [];
+          
+          let salesData = [],
+            profitData = [],
+            costData = [];
 
-        if (viewType === "daily") {
-          const daysInMonth = new Date(year, month, 0).getDate();
-          salesData = Array(daysInMonth).fill(0);
-          profitData = Array(daysInMonth).fill(0);
-          costData = Array(daysInMonth).fill(0);
-          results.forEach((item) => {
-            salesData[item.day - 1] = parseFloat(item.sum || 0);
-            profitData[item.day - 1] = parseFloat(item.profit || 0);
-            costData[item.day - 1] = parseFloat(item.cost || 0);
-          });
-        } else if (viewType === "monthly") {
-          salesData = Array(12).fill(0);
-          profitData = Array(12).fill(0);
-          costData = Array(12).fill(0);
-          results.forEach((item) => {
-            salesData[item.month - 1] = parseFloat(item.sum || 0);
-            profitData[item.month - 1] = parseFloat(item.profit || 0);
-            costData[item.month - 1] = parseFloat(item.cost || 0);
-          });
-        }
-
-        let labels = [];
+          if (viewType === "daily") {
+            const daysInMonth = new Date(year, month, 0).getDate();
+            salesData = Array(daysInMonth).fill(0);
+            profitData = Array(daysInMonth).fill(0);
+            costData = Array(daysInMonth).fill(0);
+            results.forEach((item) => {
+              if (item.day && item.day >= 1 && item.day <= daysInMonth) {
+                salesData[item.day - 1] = parseFloat(item.sum || 0);
+                profitData[item.day - 1] = parseFloat(item.profit || 0);
+                costData[item.day - 1] = parseFloat(item.cost || 0);
+              }
+            });
+          } else if (viewType === "monthly") {
+            salesData = Array(12).fill(0);
+            profitData = Array(12).fill(0);
+            costData = Array(12).fill(0);
+            results.forEach((item) => {
+              if (item.month && item.month >= 1 && item.month <= 12) {
+                salesData[item.month - 1] = parseFloat(item.sum || 0);
+                profitData[item.month - 1] = parseFloat(item.profit || 0);
+                costData[item.month - 1] = parseFloat(item.cost || 0);
+              }
+            });
+          }        let labels = [];
         
         if (viewType === "monthly") {
           labels = [
@@ -331,9 +333,9 @@ function Dashboard() {
           ],
         });
 
-        setTotalSales(res.data.totalSales);
-        setTotalProfit(res.data.totalProfit);
-        setTotalCost(res.data.totalCost);
+        setTotalSales(parseFloat(res.data.totalSales) || 0);
+        setTotalProfit(parseFloat(res.data.totalProfit) || 0);
+        setTotalCost(parseFloat(res.data.totalCost) || 0);
       }
     } catch (e) {
       Swal.fire({
@@ -405,17 +407,17 @@ function Dashboard() {
         setTodaySales({
           date: new Date(todayData.date),
           // Today's actual data
-          totalAmount: todayData.totalAmount || 0,
-          billCount: todayData.billCount || 0,
-          averagePerBill: todayData.averagePerBill || 0,
+          totalAmount: parseFloat(todayData.totalAmount) || 0,
+          billCount: parseInt(todayData.billCount) || 0,
+          averagePerBill: parseFloat(todayData.averagePerBill) || 0,
           // Yesterday's data from the API
-          yesterdayTotal: todayData.yesterdayTotal || 0,
-          yesterdayBillCount: todayData.yesterdayBillCount || 0,
-          yesterdayAveragePerBill: todayData.yesterdayAveragePerBill || 0,
+          yesterdayTotal: parseFloat(todayData.yesterdayTotal) || 0,
+          yesterdayBillCount: parseInt(todayData.yesterdayBillCount) || 0,
+          yesterdayAveragePerBill: parseFloat(todayData.yesterdayAveragePerBill) || 0,
           // Other data
           hourlyData: todayData.hourlyData || [],
           topProducts: todayData.topProducts || [],
-          growthRate: todayData.growthRate || 0,
+          growthRate: parseFloat(todayData.growthRate) || 0,
         });
       }
     } catch (error) {
@@ -544,123 +546,8 @@ function Dashboard() {
     }
   };
 
-  const renderTopSalesChart = () => {
-    const sortedProducts = [...combinedStockData]
-      .sort((a, b) => b.netProfit - a.netProfit) // เปลี่ยนจาก soldQty เป็น netProfit
-      .slice(0, 5);
-
-    const chartColors = [
-      { bg: 'rgba(75, 192, 192, 0.6)', border: 'rgba(75, 192, 192, 1)' },   // เขียว
-      { bg: 'rgba(54, 162, 235, 0.6)', border: 'rgba(54, 162, 235, 1)' },   // น้ำเงิน
-      { bg: 'rgba(255, 99, 132, 0.6)', border: 'rgba(255, 99, 132, 1)' },   // แดง
-      { bg: 'rgba(255, 159, 64, 0.6)', border: 'rgba(255, 159, 64, 1)' },   // ส้ม
-      { bg: 'rgba(153, 102, 255, 0.6)', border: 'rgba(153, 102, 255, 1)' }  // ม่วง
-    ];
-
-    return (
-      <div className="card mt-4">
-        <div className="card-header bg-white">
-          <h5 className="mb-0">สินค้าที่ทำกำไรสูงสุด 5 อันดับ</h5>
-        </div>
-        <div className="card-body">
-          <div style={{ height: '450px' }}>
-            <Bar
-              data={{
-                labels: sortedProducts.map(item => item.name),
-                datasets: [{
-                  label: 'กำไรสุทธิ',
-                  data: sortedProducts.map(item => item.netProfit),
-                  backgroundColor: sortedProducts.map((_, index) => chartColors[index].bg),
-                  borderColor: sortedProducts.map((_, index) => chartColors[index].border),
-                  borderWidth: 1
-                }]
-              }}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                layout: {
-                  padding: {
-                    top: 20,
-                    bottom: 30,
-                    left: 20,
-                    right: 20
-                  }
-                },
-                plugins: {
-                  legend: {
-                    display: false
-                  },
-                  tooltip: {
-                    callbacks: {
-                      label: function (context) {
-                        return `${formatNumber(context.raw)}`;
-                      }
-                    }
-                  }
-                },
-                scales: {
-                  y: {
-                    beginAtZero: false,
-                    min: 1,
-                    grace: '5%',
-                    ticks: {
-                      stepSize: 1,
-                      padding: 15,
-                      color: '#8e9aaf',
-                      font: {
-                        size: 12,
-                        family: '"Kanit", sans-serif',
-                        weight: '400'
-                      },
-                      callback: function (value) {
-                        return  Math.floor(value).toLocaleString('th-TH') + " บาท";
-                      }
-                    },
-                    title: {
-                      display: true,
-                      text: 'กำไรสุทธิ (บาท)',
-                      color: '#6c757d',
-                      font: {
-                        size: 13,
-                        family: '"Kanit", sans-serif',
-                        weight: '500'
-                      }
-                    }
-                  },
-                  x: {
-                    ticks: {
-                      padding: 15,
-                      maxRotation: 45,
-                      minRotation: 0,
-                      color: '#8e9aaf',
-                      font: {
-                        size: 12,
-                        family: '"Kanit", sans-serif',
-                        weight: '400'
-                      }
-                    },
-                    title: {
-                      display: true,
-                      text: 'ชื่อสินค้า',
-                      color: '#6c757d',
-                      font: {
-                        size: 13,
-                        family: '"Kanit", sans-serif',
-                        weight: '500'
-                      }
-                    }
-                  }
-                }
-              }}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   const formatNumber = (num) => {
-    return Number(num).toLocaleString("th-TH");
+    return Number(num || 0).toLocaleString("th-TH");
   };
 
   const chartContainerStyle = {
@@ -731,16 +618,16 @@ function Dashboard() {
                 {dailyViewMode === 'today' ? 'ยอดขายวันนี้' : 'ยอดขายเมื่อวาน'}
               </div>
               <div className="metric-number">
-                {dailyViewMode === 'today' 
-                  ? todaySales.totalAmount.toLocaleString()
-                  : todaySales.yesterdayTotal.toLocaleString()
-                } บาท
+                {(dailyViewMode === 'today' 
+                  ? todaySales.totalAmount
+                  : todaySales.yesterdayTotal
+                ).toLocaleString('th-TH')} บาท
               </div>
               <div className="comparison-text mt-3">
                 <i className="fas fa-chart-line me-2"></i>
                 {dailyViewMode === 'today' 
-                  ? `เมื่อวาน: ${todaySales.yesterdayTotal.toLocaleString()} บาท`
-                  : `วันนี้: ${todaySales.totalAmount.toLocaleString()} บาท`
+                  ? `เมื่อวาน: ${todaySales.yesterdayTotal.toLocaleString('th-TH')} บาท`
+                  : `วันนี้: ${todaySales.totalAmount.toLocaleString('th-TH')} บาท`
                 }
               </div>
             </div>
@@ -759,10 +646,10 @@ function Dashboard() {
                 {dailyViewMode === 'today' ? 'จำนวนบิลวันนี้' : 'จำนวนบิลเมื่อวาน'}
               </div>
               <div className="metric-number">
-                {dailyViewMode === 'today' 
+                {(dailyViewMode === 'today' 
                   ? todaySales.billCount
                   : todaySales.yesterdayBillCount
-                } บิล
+                )} บิล
               </div>
               <div className="comparison-text mt-3">
                 <i className="fas fa-receipt me-2"></i>
@@ -781,16 +668,16 @@ function Dashboard() {
               </div>
               <div className="metric-label mb-2">ค่าเฉลี่ยต่อบิล</div>
               <div className="metric-number">
-                {dailyViewMode === 'today' 
-                  ? todaySales.averagePerBill.toLocaleString()
-                  : todaySales.yesterdayAveragePerBill.toLocaleString()
-                } บาท
+                {(dailyViewMode === 'today' 
+                  ? todaySales.averagePerBill
+                  : todaySales.yesterdayAveragePerBill
+                ).toLocaleString('th-TH')} บาท
               </div>
               <div className="comparison-text mt-3">
                 <i className="fas fa-calculator me-2"></i>
                 {dailyViewMode === 'today' 
-                  ? `เมื่อวาน: ${todaySales.yesterdayAveragePerBill.toLocaleString()} บาท`
-                  : `วันนี้: ${todaySales.averagePerBill.toLocaleString()} บาท`
+                  ? `เมื่อวาน: ${todaySales.yesterdayAveragePerBill.toLocaleString('th-TH')} บาท`
+                  : `วันนี้: ${todaySales.averagePerBill.toLocaleString('th-TH')} บาท`
                 }
               </div>
             </div>
@@ -1399,7 +1286,7 @@ function Dashboard() {
                                   weight: '400'
                                 },
                                 callback: function (value) {
-                                  return  Math.floor(value).toLocaleString('th-TH')+ ' บาท';
+                                  return Math.floor(parseFloat(value) || 0).toLocaleString('th-TH') + ' บาท';
                                 }
                               },
                               title: {
