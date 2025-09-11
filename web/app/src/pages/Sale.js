@@ -556,7 +556,7 @@ function Sale() {
       );
 
       if (response.data.message === "success") {
-       
+
 
         // รีเฟรชข้อมูล
         await Promise.all([
@@ -862,8 +862,7 @@ function Sale() {
         title: "พิมพ์บิลสำเร็จ",
         text: `พิมพ์บิลเลขที่ #${billData.id} เรียบร้อยแล้ว (วันที่ชำระ: ${(() => {
           if (!billData?.payDate) return "-";
-          // แสดงวันที่ตาม payDate (วันที่ชำระเงินจริง) ไม่ใช่วันที่สร้างบิล
-          // และแก้ปัญหาบิลที่พักไว้ก่อนหน้าแต่พิมพ์ตามวันที่ล่าสุดเสมอ
+
           const date = new Date(billData.payDate);
           return date.toLocaleString('th-TH', {
             year: 'numeric',
@@ -1045,7 +1044,7 @@ function Sale() {
                   />
                 </div>
 
-               
+
 
                 <div className="row g-4">
                   {sortedCategoriesToShow.length > 0 ? (
@@ -1666,7 +1665,7 @@ function Sale() {
                   {heldBills.map((heldBill, index) => (
                     <tr key={index}>
                       <td>#{heldBill.billSaleId}</td>
-                      
+
                       <td>
                         {(() => {
                           // ใช้ Date object เพื่อแสดงเวลาท้องถิ่นที่ถูกต้อง
@@ -2284,7 +2283,7 @@ function Sale() {
             </table>
             <hr style={{ border: "none", borderTop: "1px dashed #888" }} />
 
-            {/* รวมทั้งสิ้น */}
+            {/* ยอดรวมก่อนหักส่วนลด */}
             <div
               style={{
                 fontSize: "13px",
@@ -2294,10 +2293,10 @@ function Sale() {
                 width: "100%",
               }}
             >
-              <span style={{ flex: 1, textAlign: "left" }}>รวมทั้งสิ้น:</span>
+              <span style={{ flex: 1, textAlign: "left" }}>ยอดรวม:</span>
               <span style={{ flex: 1, textAlign: "right" }}>
-                {lastBill?.billSaleDetails
-                  ? `${lastBill.billSaleDetails.reduce((sum, item) => sum + parseFloat(item.qty), 0)} ชิ้น / ${lastBill.billSaleDetails
+                {selectedBill?.billSaleDetails
+                  ? `${selectedBill.billSaleDetails.reduce((sum, item) => sum + parseFloat(item.qty), 0)} ชิ้น / ${selectedBill.billSaleDetails
                     .reduce(
                       (sum, item) =>
                         sum + parseFloat(item.qty) * parseFloat(item.price),
@@ -2308,39 +2307,112 @@ function Sale() {
               </span>
             </div>
 
+            {/* แสดงส่วนลดหากมี */}
+            {selectedBill?.description && selectedBill.description.includes("ใช้แต้มสะสม") && (
+              <div
+                style={{
+                  fontSize: "13px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: "8px",
+                  width: "100%",
+                  color: "#e74c3c",
+                }}
+              >
+                <span style={{ flex: 1, textAlign: "left" }}>ส่วนลดจากแต้ม:</span>
+                <span style={{ flex: 1, textAlign: "right" }}>
+                  {(() => {
+                    // ดึงจำนวนส่วนลดจาก description
+                    const match = selectedBill.description.match(/ส่วนลด (\d+) บาท/);
+                    return match ? `-${parseInt(match[1]).toLocaleString("th-TH")} บาท` : "-";
+                  })()}
+                </span>
+              </div>
+            )}
+
+            {/* ยอดสุทธิ */}
+            <div
+              style={{
+                fontSize: "14px",
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "8px",
+                width: "100%",
+                fontWeight: "bold",
+                borderTop: "1px dashed #888",
+                paddingTop: "8px",
+              }}
+            >
+              <span style={{ flex: 1, textAlign: "left" }}>ยอดสุทธิ:</span>
+              <span style={{ flex: 1, textAlign: "right" }}>
+                {(() => {
+                  if (!selectedBill?.billSaleDetails) return "0 บาท";
+                  
+                  const totalBeforeDiscount = selectedBill.billSaleDetails.reduce(
+                    (sum, item) => sum + parseFloat(item.qty) * parseFloat(item.price),
+                    0
+                  );
+                  
+                  let discount = 0;
+                  if (selectedBill.description && selectedBill.description.includes("ใช้แต้มสะสม")) {
+                    const match = selectedBill.description.match(/ส่วนลด (\d+) บาท/);
+                    discount = match ? parseInt(match[1]) : 0;
+                  }
+                  
+                  const netTotal = totalBeforeDiscount - discount;
+                  return `${netTotal.toLocaleString("th-TH")} บาท`;
+                })()}
+              </span>
+            </div>
+
             {/* ข้อมูลการชำระเงิน */}
-            {lastBill?.method && (
+            {selectedBill?.paymentMethod && (
               <div style={{ fontSize: "12px", marginTop: "8px", marginBottom: "8px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                  <span>การชำระเงิน:</span>
+                  <span>วิธีการชำระเงิน:</span>
                   <span>
-                    {lastBill.method === "Cash" && "เงินสด"}
-                    {lastBill.method === "PromptPay" && "พร้อมเพย์"}
-                    {lastBill.method === "Transfer" && "โอนเงิน"}
-                    {lastBill.method === "Split" && "ชำระแบบผสม"}
+                    {selectedBill.paymentMethod === "Cash" && "เงินสด"}
+                    {selectedBill.paymentMethod === "PromptPay" && "พร้อมเพย์"}
+                    {selectedBill.paymentMethod === "Transfer" && "โอนเงิน"}
+                    {selectedBill.paymentMethod === "Split" && "ชำระแบบผสม"}
                   </span>
                 </div>
-                {lastBill.method === "Cash" && (
+                {selectedBill.paymentMethod === "Cash" && selectedBill.received && (
                   <>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
                       <span>รับเงิน:</span>
-                      <span>{parseFloat(lastBill.received || 0).toLocaleString("th-TH")} บาท</span>
+                      <span>{parseFloat(selectedBill.received || 0).toLocaleString("th-TH")} บาท</span>
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
                       <span>เงินทอน:</span>
-                      <span>{(parseFloat(lastBill.received || 0) - parseFloat(lastBill.total || 0)).toLocaleString("th-TH")} บาท</span>
+                      <span>{(parseFloat(selectedBill.received || 0) - parseFloat(selectedBill.total || 0)).toLocaleString("th-TH")} บาท</span>
                     </div>
                   </>
                 )}
                 {/* แสดงรายละเอียดการชำระแบบผสม */}
-                {lastBill.method === "Split" && lastBill.description && (
+                {selectedBill.paymentMethod === "Split" && selectedBill.description && (
                   <div style={{ fontSize: "11px", color: "#666", marginTop: "4px" }}>
-                    {lastBill.description.split(" | ").map((part, index) => {
+                    {selectedBill.description.split(" | ").map((part, index) => {
                       if (part.includes("ชำระแบบผสม")) {
                         const paymentInfo = part.replace("ชำระแบบผสม - ", "");
                         return (
                           <div key={index} style={{ marginLeft: "10px" }}>
                             {paymentInfo}
+                          </div>
+                        );
+                      }
+                      return null;
+                    })}
+                  </div>
+                )}
+                {/* แสดงข้อมูลส่วนลดจากแต้ม */}
+                {selectedBill.description && selectedBill.description.includes("ใช้แต้มสะสม") && (
+                  <div style={{ fontSize: "11px", color: "#27ae60", marginTop: "4px", fontStyle: "italic" }}>
+                    {selectedBill.description.split(" | ").map((part, index) => {
+                      if (part.includes("ใช้แต้มสะสม")) {
+                        return (
+                          <div key={index}>
+                            ✓ {part}
                           </div>
                         );
                       }
@@ -2497,41 +2569,27 @@ function Sale() {
           color: "#222",
         }}
       >
+         <div>
+            {(() => {
+              if (!lastBill?.payDate) return "วันที่ชำระเงิน " ;
+
+              const date = new Date(lastBill.payDate);
+              const formattedDate = date.toLocaleString('th-TH', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+              });
+              return `${formattedDate} น. `;
+            })()}
+            <div>เลขที่ใบเสร็จ <b>{lastBill?.id || "-"}</b></div>
+          </div>
         <div style={{ padding: "10px" }}>
           <hr style={{ border: "none", borderTop: "1px dashed #888" }} />
 
-          {/* Bill Info */}
-          <div style={{ marginBottom: "8px" }}>
-            {(lastBill?.Customer?.idcustomers || memberInfo?.idcustomers) && (
-              <div>
-                รหัสลูกค้า: {lastBill?.Customer?.idcustomers || memberInfo?.idcustomers}
-              </div>
-            )}
-            <div>
-              วันที่ชำระเงิน {" "}
-              {(() => {
-                if (!lastBill?.payDate) return "-";
-
-                // ใช้ Date object เพื่อแสดงเวลาท้องถิ่นที่ถูกต้อง
-                // ใช้ payDate แทนวันที่สร้างบิล เพื่อให้ตรงกับวันที่ลูกค้าจ่ายเงินจริง
-                // และแก้ปัญหาบิลที่พักไว้ก่อนหน้าแต่พิมพ์ตามวันที่ล่าสุดเสมอ
-                const date = new Date(lastBill.payDate);
-                return date.toLocaleString('th-TH', {
-                  year: 'numeric',
-                  month: '2-digit',
-                  day: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  hour12: false
-                });
-              })()}
-            </div>
-            <div>
-              เลขที่บิล: <b>{lastBill?.id || "-"}</b>
-            </div>
-          </div>
-          <hr style={{ border: "none", borderTop: "1px dashed #888" }} />
-
+          รายการสินค้า
           {/* Items Table */}
           <table
             style={{
@@ -2541,7 +2599,7 @@ function Sale() {
               borderSpacing: "0 2px",
             }}
           >
-           
+
             <tbody>
               {lastBill?.billSaleDetails?.map((item, index) => (
                 <tr key={index}>
@@ -2566,7 +2624,7 @@ function Sale() {
                   >
                     {item.product.name || "-"}
                   </td>
-                  
+
                   <td
                     style={{
                       textAlign: "right",
@@ -2594,21 +2652,18 @@ function Sale() {
           </table>
           <hr style={{ border: "none", borderTop: "1px dashed #888" }} />
 
-          {/* รวมทั้งสิ้น */}
+          {/* ยอดรวมก่อนหักส่วนลด */}
           <div
             style={{
               fontSize: "13px",
               display: "flex",
               justifyContent: "space-between",
-              marginBottom: "8px",
+              marginBottom: "4px",
               marginTop: "8px",
               width: "100%",
-              paddingTop: "4px",
-              fontWeight: "bold",
             }}
           >
-            {/* คำนวณยอดรวมจาก lastBill.billSaleDetails ใน slip */}
-            <span style={{ flex: 1, textAlign: "left" }}>รวมทั้งสิ้น:</span>
+            <span style={{ flex: 1, textAlign: "left" }}>ยอดรวม</span>
             <span style={{ flex: 1, textAlign: "right", paddingLeft: "20px" }}>
               {lastBill?.billSaleDetails
                 ? `${lastBill.billSaleDetails.reduce((sum, item) => sum + parseFloat(item.qty), 0)} ชิ้น / ${parseInt(
@@ -2622,41 +2677,118 @@ function Sale() {
             </span>
           </div>
 
-          {/* แสดงข้อมูลการชำระเงิน */}
-          {lastBill?.method && (
-            <div style={{ fontSize: "12px", marginTop: "8px", marginBottom: "8px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                <span>วิธีชำระ:</span>
-                <span>
-                  {lastBill.method === "Cash" && "เงินสด"}
-                  {lastBill.method === "PromptPay" && "พร้อมเพย์"}
-                  {lastBill.method === "Split" && "ชำระแบบผสม"}
-                </span>
-              </div>
-
-              {/* แสดงรายละเอียดการชำระแบบผสม */}
-              {lastBill.method === "Split" && lastBill.description && (
-                <div style={{ fontSize: "11px", color: "#666", marginTop: "4px" }}>
-                  {lastBill.description.split(" | ").map((part, index) => {
-                    if (part.includes("ชำระแบบผสม")) {
-                      const paymentInfo = part.replace("ชำระแบบผสม - ", "");
-                      return (
-                        <div key={index} style={{ marginLeft: "10px" }}>
-                          {paymentInfo}
-                        </div>
-                      );
-                    }
-                    return null;
-                  })}
-                </div>
-              )}
+          {/* แสดงส่วนลดหากมี */}
+          {lastBill?.description && lastBill.description.includes("ใช้แต้มสะสม") && (
+            <div
+              style={{
+                fontSize: "12px",
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "4px",
+                width: "100%",
+                
+              }}
+            >
+              <span style={{ flex: 1, textAlign: "left" }}>ส่วนลดจากแต้ม</span>
+              <span style={{ flex: 1, textAlign: "right", paddingLeft: "20px" }}>
+                {(() => {
+                  // ดึงจำนวนส่วนลดจาก description
+                  const match = lastBill.description.match(/ส่วนลด (\d+) บาท/);
+                  return match ? `-${parseInt(match[1]).toLocaleString("th-TH")} บาท` : "-";
+                })()}
+              </span>
             </div>
           )}
+
+          {/* ยอดสุทธิ (หลังหักส่วนลด) */}
+          <div
+            style={{
+              fontSize: "13px",
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: "8px",
+              width: "100%",
+              fontWeight: "bold",
+              borderTop: "1px dashed #888",
+              paddingTop: "8px",
+            }}
+          >
+            <span style={{ flex: 1, textAlign: "left" }}>ยอดสุทธิ</span>
+            <span style={{ flex: 1, textAlign: "right", paddingLeft: "20px" }}>
+              {(() => {
+                if (!lastBill?.billSaleDetails) return "0.00 บาท";
+                
+                const totalBeforeDiscount = parseInt(
+                  lastBill.billSaleDetails.reduce(
+                    (sum, item) => sum + parseFloat(item.qty) * parseFloat(item.price),
+                    0
+                  )
+                );
+                
+                let discount = 0;
+                if (lastBill.description && lastBill.description.includes("ใช้แต้มสะสม")) {
+                  const match = lastBill.description.match(/ส่วนลด (\d+) บาท/);
+                  discount = match ? parseInt(match[1]) : 0;
+                }
+                
+                const netTotal = totalBeforeDiscount - discount;
+                return `${netTotal.toLocaleString("th-TH")}.00 บาท`;
+              })()}
+            </span>
+          </div>
+
+          {/* วิธีชำระ */}
+          <div
+            style={{
+              fontSize: "13px",
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: "8px",
+              width: "100%",
+            }}
+          >
+            <span style={{ flex: 1, textAlign: "left" }}>
+              {lastBill?.paymentMethod === "Cash" && "เงินสด"}
+              {lastBill?.paymentMethod === "PromptPay" && "พร้อมเพย์"}
+              {lastBill?.paymentMethod === "Transfer" && "โอนเงิน"}
+              {lastBill?.paymentMethod === "Split" && "ชำระแบบผสม"}
+            </span>
+            <span style={{ flex: 1, textAlign: "right", paddingLeft: "20px" }}>
+              {(() => {
+                if (!lastBill?.billSaleDetails) return "0.00";
+                
+                const totalBeforeDiscount = parseInt(
+                  lastBill.billSaleDetails.reduce(
+                    (sum, item) => sum + parseFloat(item.qty) * parseFloat(item.price),
+                    0
+                  )
+                );
+                
+                let discount = 0;
+                if (lastBill.description && lastBill.description.includes("ใช้แต้มสะสม")) {
+                  const match = lastBill.description.match(/ส่วนลด (\d+) บาท/);
+                  discount = match ? parseInt(match[1]) : 0;
+                }
+                
+                const netTotal = totalBeforeDiscount - discount;
+                return `${netTotal.toLocaleString("th-TH")}.00`;
+              })()}
+            </span>
+          </div>
+         
+           <div style={{ marginBottom: "8px" }}>
+            {(lastBill?.Customer?.idcustomers || memberInfo?.idcustomers) && (
+              <div>
+                รหัสลูกค้า: {lastBill?.Customer?.idcustomers || memberInfo?.idcustomers}
+              </div>
+            )}
+           
+            
+          </div>
           <div
             style={{ textAlign: "center", marginTop: "10px", fontSize: "13px" }}
           >
             <p style={{ margin: "0" }}>*** ขอบคุณที่ใช้บริการ ***</p>
-            {/* <div>Line: @yourshop</div> */}
           </div>
         </div>
       </div>
