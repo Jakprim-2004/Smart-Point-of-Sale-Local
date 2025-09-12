@@ -1083,18 +1083,22 @@ function Sale() {
                             </div>
 
                             <div className="product-info">
-                              <h5 className="fw-bold mb-2">
-                                {item.name}
-                              </h5>
-                              <span
-                                className="h3 mb-0"
-                                style={{ color: "#2563eb" }}
-                              >
-                                {parseInt(item.price).toLocaleString("th-TH")} บาท
-                              </span>
-                              <div className="text-center mb-3">
+                              <div className="product-name">
+                                <h5 className="fw-bold mb-2">
+                                  {item.name}
+                                </h5>
+                              </div>
+                              <div className="product-price">
+                                <span
+                                  className="h4 mb-0"
+                                  style={{ color: "#2563eb", fontWeight: "600" }}
+                                >
+                                  {parseInt(item.price).toLocaleString("th-TH")} บาท
+                                </span>
+                              </div>
+                              <div className="product-barcode">
                                 <Barcode
-                                  value={item.barcode}
+                                   value={item.barcode}
                                   width={1}
                                   height={25}
                                   fontSize={10}
@@ -1308,6 +1312,12 @@ function Sale() {
           cursor: pointer;
           border: none;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          background: #ffffff;
+          border-radius: 12px;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
         }
 
         .product-card:hover {
@@ -1345,6 +1355,44 @@ function Sale() {
         .product-info {
           padding: 15px;
           text-align: center;
+          background: #ffffff;
+          border-radius: 0 0 12px 12px;
+          display: flex;
+          flex-direction: column;
+          flex-grow: 1;
+          justify-content: space-between;
+          min-height: 120px;
+        }
+
+        .product-name {
+          flex-grow: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 48px;
+          max-height: 48px;
+          overflow: hidden;
+        }
+
+        .product-name h5 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          line-height: 1.2;
+          margin: 0;
+          font-size: 0.95rem;
+        }
+
+        
+
+        .product-barcode {
+          margin-top: 5px;
+          height: 35px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .cart-container {

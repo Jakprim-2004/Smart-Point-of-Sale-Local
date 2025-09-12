@@ -1825,7 +1825,8 @@ function Dashboard() {
           padding: 8px 10px !important;
           cursor: pointer !important;
           transition: all 0.2s ease !important;
-          min-width: 80px !important;
+          min-width: 180px !important;
+          max-width: 250px !important;
           position: relative !important;
           box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04) !important;
           overflow: hidden !important;
