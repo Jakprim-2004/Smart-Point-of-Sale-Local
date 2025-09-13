@@ -81,8 +81,14 @@ const Sidebar = forwardRef((props, sidebarRef) => {
       imageHeight: 200,
       showCancelButton: true,
       showConfirmButton: true,
-      confirmButtonText: "ออกจากระบบ",
-      cancelButtonText: "ยกเลิก"
+      confirmButtonText: "Confirm",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: '#f44336',   // Red color
+      customClass: {
+        confirmButton: 'btn btn-danger mx-2 px-4',
+        cancelButton: 'btn btn-secondary mx-2 px-4'
+      }
+     
     });
     
     if (result.isConfirmed) {
