@@ -42,6 +42,7 @@ function Sale() {
   const [showBillDetailModal, setShowBillDetailModal] = useState(false);
   const [pointsToRedeem, setPointsToRedeem] = useState(0);
   const [discountFromPoints, setDiscountFromPoints] = useState(0);
+  const [hasIncompletePhone, setHasIncompletePhone] = useState(false);
 
   // Split Payment states
   const [showSplitPaymentModal, setShowSplitPaymentModal] = useState(false);
@@ -289,6 +290,20 @@ function Sale() {
     }
   };
 
+  // ฟังก์ชันตรวจสอบว่าสามารถจบการขายได้หรือไม่
+  const canCompleteSale = () => {
+    if (hasIncompletePhone) {
+      Swal.fire({
+        title: "ไม่สามารถจบการขายได้",
+        text: "กรุณากรอกเบอร์โทรลูกค้าให้ครบ 10 หลัก หรือล้างข้อมูลลูกค้า",
+        icon: "error",
+        confirmButtonText: "ตกลง"
+      });
+      return false;
+    }
+    return true;
+  };
+
   // จบการขายและพิมพ์บิลทันที
   const handleEndSaleAndPrint = async () => {
     if (
@@ -300,6 +315,11 @@ function Sale() {
         text: "ไม่มีสินค้าในตะกร้า",
         icon: "warning",
       });
+      return;
+    }
+
+    // ตรวจสอบเบอร์โทรที่ไม่ครบ
+    if (!canCompleteSale()) {
       return;
     }
 
@@ -364,6 +384,7 @@ function Sale() {
         setFilteredCustomers([]);
         setItem({});
         setPaymentMethod("Cash");
+        setHasIncompletePhone(false);
 
         // ปิด Modal จบการขาย
         setShowEndSaleModal(false);
@@ -604,6 +625,11 @@ function Sale() {
 
   // ฟังก์ชันสำหรับจัดการ Split Payment
   const handleSplitPayment = () => {
+    // ตรวจสอบเบอร์โทรที่ไม่ครบ
+    if (!canCompleteSale()) {
+      return;
+    }
+
     const totalAfterDiscount = totalPrice - discountFromPoints;
     const totalPayment = safeParseFloat(cashAmount) + safeParseFloat(transferAmount);
 
@@ -695,6 +721,7 @@ function Sale() {
         setCashAmount(0);
         setTransferAmount(0);
         setIsSplitPayment(false);
+        setHasIncompletePhone(false);
 
         // ปิด Modal จบการขาย
         setShowEndSaleModal(false);
@@ -735,12 +762,24 @@ function Sale() {
     }
   };
 
+  // ฟังก์ชันตรวจสอบเบอร์โทรที่ไม่ครบ
+  const isIncompletePhoneNumber = (text) => {
+    // ตรวจสอบว่าเป็นตัวเลขเท่านั้น และมีความยาวน้อยกว่า 10 หลัก แต่มากกว่า 0
+    const phoneRegex = /^\d+$/;
+    return phoneRegex.test(text) && text.length > 0 && text.length < 10;
+  };
+
   // ฟังก์ชันค้นหาลูกค้า
   const searchCustomers = (searchText) => {
     if (!searchText || searchText.length < 1) {
       setFilteredCustomers([]);
+      setHasIncompletePhone(false);
       return;
     }
+
+    // ตรวจสอบเบอร์โทรที่ไม่ครบ
+    const isIncomplete = isIncompletePhoneNumber(searchText);
+    setHasIncompletePhone(isIncomplete);
 
     const filtered = customers.filter(
       (customer) =>
@@ -756,6 +795,7 @@ function Sale() {
     setCustomerSearchText(customer.name + " - " + customer.phone);
     setShowCustomerDropdown(false);
     setFilteredCustomers([]);
+    setHasIncompletePhone(false); // รีเซ็ตสถานะเบอร์โทรไม่ครบ
     // รีเซ็ตค่าแต้มที่ใช้เมื่อเปลี่ยนลูกค้า
     setPointsToRedeem(0);
     setDiscountFromPoints(0);
@@ -767,6 +807,7 @@ function Sale() {
     setCustomerSearchText("");
     setShowCustomerDropdown(false);
     setFilteredCustomers([]);
+    setHasIncompletePhone(false); // รีเซ็ตสถานะเบอร์โทรไม่ครบ
     setPointsToRedeem(0);
     setDiscountFromPoints(0);
   };
@@ -1752,6 +1793,14 @@ function Sale() {
               </table>
             </div>
           )}
+
+          {/* แสดงข้อความเตือนหากมีเบอร์โทรไม่ครบ */}
+          {hasIncompletePhone && (
+            <div className="alert alert-warning mt-3" role="alert">
+              <i className="fa fa-exclamation-triangle me-2"></i>
+              <strong>ไม่สามารถจบการขายได้:</strong> กรุณากรอกเบอร์โทรลูกค้าให้ครบ 10 หลัก หรือล้างข้อมูลลูกค้า
+            </div>
+          )}
         </div>
       </Modal>
 
@@ -1877,14 +1926,39 @@ function Sale() {
             <div className="input-group position-relative">
               <input
                 type="text"
-                className="form-control"
-                placeholder="ค้นหาด้วยชื่อหรือเบอร์โทร..."
+                className={`form-control ${
+                  customerSearchText && isIncompletePhoneNumber(customerSearchText) 
+                    ? 'border-warning' 
+                    : ''
+                }`}
+                placeholder="ค้นหาด้วยชื่อหรือเบอร์โทร (เบอร์โทร 10 หลัก)..."
                 value={customerSearchText}
                 onChange={(e) => {
-                  const value = e.target.value;
-                  setCustomerSearchText(value);
-                  searchCustomers(value);
-                  setShowCustomerDropdown(value.length > 0);
+                  let value = e.target.value;
+                  
+                  // ถ้าเป็นตัวเลขทั้งหมด ให้จำกัดที่ 10 หลัก
+                  if (/^\d+$/.test(value)) {
+                    if (value.length <= 10) {
+                      setCustomerSearchText(value);
+                      searchCustomers(value);
+                      setShowCustomerDropdown(value.length > 0);
+                    }
+                    // รีเซ็ตสถานะเบอร์ไม่ครบเมื่อครบ 10 หลักหรือล้างข้อมูล
+                    if (value.length === 0 || value.length === 10) {
+                      setHasIncompletePhone(false);
+                    }
+                  } else {
+                    // ถ้าไม่ใช่ตัวเลขล้วน ให้ค้นหาตามชื่อได้
+                    setCustomerSearchText(value);
+                    searchCustomers(value);
+                    setShowCustomerDropdown(value.length > 0);
+                    setHasIncompletePhone(false);
+                  }
+                  
+                  // รีเซ็ตสถานะเบอร์ไม่ครบเมื่อล้างข้อมูล
+                  if (value.length === 0) {
+                    setHasIncompletePhone(false);
+                  }
                 }}
                 onFocus={() => {
                   if (customerSearchText.length > 0) {
@@ -2069,6 +2143,8 @@ function Sale() {
                 <button
                   onClick={handleEndSaleAndPrint}
                   className="btn btn-success btn-lg w-100 mt-3 qr-confirm-btn"
+                  disabled={hasIncompletePhone}
+                  title={hasIncompletePhone ? "กรุณากรอกเบอร์โทรให้ครบ 10 หลัก" : "ยืนยันการชำระเงิน"}
                 >
                   <i className="fas fa-check-circle me-2"></i>
                   ยืนยันการชำระเงิน
@@ -2238,7 +2314,8 @@ function Sale() {
                   <button
                     onClick={handleSplitPayment}
                     className="btn btn-success"
-                    disabled={!cashAmount && !transferAmount}
+                    disabled={(!cashAmount && !transferAmount) || hasIncompletePhone}
+                    title={hasIncompletePhone ? "กรุณากรอกเบอร์โทรให้ครบ 10 หลัก" : "ยืนยันการชำระ"}
                   >
                     <i className="fa fa-check me-2"></i>
                     ยืนยันการชำระ
@@ -2271,23 +2348,34 @@ function Sale() {
                 <div className="text-center mt-3">
                   <button
                     onClick={async () => {
+                      // ตรวจสอบเบอร์โทรที่ไม่ครบ
+                      if (!canCompleteSale()) {
+                        return;
+                      }
                       setInputMoney(totalPrice - discountFromPoints);
                       // จบการขายทันทีและพิมพ์บิล
                       await handleEndSaleAndPrint();
                     }}
                     className="btn btn-primary me-2"
+                    disabled={hasIncompletePhone}
+                    title={hasIncompletePhone ? "กรุณากรอกเบอร์โทรให้ครบ 10 หลัก" : "จ่ายพอดี"}
                   >
                     <i className="fa fa-check me-2"></i>
                     จ่ายพอดี
                   </button>
                   <button
                     onClick={async () => {
+                      // ตรวจสอบเบอร์โทรที่ไม่ครบ
+                      if (!canCompleteSale()) {
+                        return;
+                      }
                       setInputMoney(totalPrice - discountFromPoints);
                       // จบการขายทันทีและพิมพ์บิล
                       await handleEndSaleAndPrint();
                     }}
                     className="btn btn-success"
-                    disabled={inputMoney <= 0}
+                    disabled={inputMoney <= 0 || hasIncompletePhone}
+                    title={hasIncompletePhone ? "กรุณากรอกเบอร์โทรให้ครบ 10 หลัก" : "จบการขาย"}
                   >
                     <i className="fa fa-check me-2"></i>
                     จบการขาย
