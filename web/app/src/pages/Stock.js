@@ -411,7 +411,7 @@ function Stock() {
   // ลบสต็อก
   const handleDeleteStock = (item) => {
     Swal.fire({
-      title: "ลบรายการสต็อก",
+      title: "ลบประวัติการเพิ่มสต็อก",
       text: `ยืนยันการลบ "${item.product?.name || "รายการนี้"}" จากสต็อก`,
         icon: "warning",
       showCancelButton: true,
