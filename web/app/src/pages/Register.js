@@ -25,9 +25,13 @@ function Register() {
    
 
     const validateEmail = (email) => {
-        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return re.test(email);
-    };
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const allowedDomains = [
+        'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com'
+    ];
+    const domain = email.split('@')[1];
+    return re.test(email) && allowedDomains.includes(domain);
+};
 
     const handlePhoneChange = (e) => {
         const value = e.target.value.replace(/\D/g, ''); 
