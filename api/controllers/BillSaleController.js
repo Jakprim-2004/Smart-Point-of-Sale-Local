@@ -293,12 +293,23 @@ app.post('/billSale/endSale', service.isLogin, async (req, res) => {
 
         // บันทึกการใช้แต้มลดราคา (ถ้ามี)
         if (req.body.pointTransaction && updatePayload.customerId) {
-            // ตรวจสอบว่า pointTransaction มี customerId ที่ถูกต้อง
-            const pointTransaction = {
-                ...req.body.pointTransaction,
-                customerId: updatePayload.customerId // ใช้ customerId ที่ตรวจสอบแล้ว
-            };
-            await PointTransactionModel.create(pointTransaction);
+            const customer = await CustomerModel.findByPk(updatePayload.customerId);
+            if (customer) {
+                const pointsUsed = Math.abs(req.body.pointTransaction.points);
+                
+                // หักแต้มออกจากยอดแต้มสะสมของลูกค้า
+                customer.points = Math.max(0, customer.points - pointsUsed);
+                customer.updateMembershipTier(); // อัพเดตระดับสมาชิก
+                await customer.save();
+                
+                // บันทึกประวัติการใช้แต้ม (เก็บค่าลบเพื่อระบุว่าเป็นการใช้)
+                const pointTransaction = {
+                    ...req.body.pointTransaction,
+                    customerId: updatePayload.customerId,
+                    points: -pointsUsed // บันทึกเป็นค่าลบเพื่อแยกแยะประวัติ
+                };
+                await PointTransactionModel.create(pointTransaction);
+            }
         }
 
         res.json({ message: 'success', result: updatedBill });

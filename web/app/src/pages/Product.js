@@ -1240,7 +1240,7 @@ function Product() {
                         />
                         <div className="card-body text-center">
                           {item.isMain ? (
-                            <button className="btn btn-warning   btn-sm mr-2 shadow-sm ">
+                            <button className="btn btn-success btn-sm mr-2 shadow-sm ">
                               ภาพหลัก
                             </button>
                           ) : (

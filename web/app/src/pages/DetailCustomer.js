@@ -15,7 +15,29 @@ function DetailCustomer() {
 
     
 
+    // ฟังก์ชันโหลดข้อมูลลูกค้าจาก API
+    const loadCustomerData = async (customerId) => {
+        try {
+            const response = await axios.get(`${config.api_path}/customer/${customerId}`);
+            if (response.data.result) {
+                setCustomer(response.data.result);
+            } else {
+                throw new Error('ไม่พบข้อมูลลูกค้า');
+            }
+        } catch (error) {
+            console.error('Error loading customer data:', error);
+            Swal.fire({
+                title: 'เกิดข้อผิดพลาด',
+                text: 'ไม่สามารถโหลดข้อมูลลูกค้าได้',
+                icon: 'error'
+            }).then(() => {
+                navigate('/login/customer');
+            });
+        }
+    };
+
     useEffect(() => {
+        // ตรวจสอบว่ามีข้อมูล customerId ใน localStorage หรือไม่
         const customerData = localStorage.getItem('customerData');
         if (!customerData) {
             Swal.fire({
@@ -26,7 +48,11 @@ function DetailCustomer() {
             });
             return;
         }
-        setCustomer(JSON.parse(customerData));
+        
+        // ใช้เฉพาะ ID จาก localStorage แล้วดึงข้อมูลจาก API
+        const parsedCustomer = JSON.parse(customerData);
+        loadCustomerData(parsedCustomer.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [navigate]);
 
     // โหลดข้อมูลประวัติการซื้อ
@@ -100,12 +126,14 @@ function DetailCustomer() {
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'ใช่, ออกจากระบบ',
+            cancelButtonColor: '',
+            confirmButtonText: 'ออกจากระบบ',
             cancelButtonText: 'ยกเลิก'
         }).then((result) => {
             if (result.isConfirmed) {
+                // ล้างข้อมูลใน localStorage
                 localStorage.removeItem('customerData');
+                
                 Swal.fire({
                     title: 'ออกจากระบบสำเร็จ',
                     icon: 'success',
@@ -255,7 +283,16 @@ function DetailCustomer() {
         </div>
     );
 
-    if (!customer) return <div>Loading...</div>;
+    if (!customer) return (
+        <div className="container mt-5">
+            <div className="text-center">
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+                <p className="mt-2">กำลังโหลดข้อมูลลูกค้า...</p>
+            </div>
+        </div>
+    );
 
     return (
         <div className="container mt-5">
@@ -265,7 +302,7 @@ function DetailCustomer() {
                     <div className="d-flex justify-content-between align-items-center">
                         <h3 className="mb-0">ข้อมูลลูกค้า</h3>
                         <div>
-                            <button className="btn btn-danger ms-auto" onClick={handleLogout}>ออกจากระบบ</button>
+                            <button className="btn btn-danger" onClick={handleLogout}>ออกจากระบบ</button>
                         </div>
                     </div>
                 </div>
@@ -278,9 +315,26 @@ function DetailCustomer() {
                             <p><strong>อีเมล:</strong> {customer.email || '-'}</p>
                         </div>
                         <div className="col-md-6">
-                            <p><strong>แต้มสะสม:</strong> {customer.points}</p>
-                            <p><strong>ระดับสมาชิก:</strong> {customer.membershipTier}</p>
-                            <p><strong>ยอดใช้จ่ายสะสม:</strong> {customer.totalSpent}</p>
+                            <p><strong>แต้มสะสม:</strong> 
+                                <span className="badge bg-primary fs-6 ms-2">
+                                    <i className="fas fa-star me-1"></i>
+                                    {customer.points} แต้ม
+                                </span>
+                            </p>
+                            <p><strong>ระดับสมาชิก:</strong> 
+                                <span className="badge bg-secondary ms-2">{customer.membershipTier}</span>
+                            </p>
+                            <p><strong>ยอดใช้จ่ายสะสม:</strong> 
+                                <span className="text-success fw-bold">{parseFloat(customer.totalSpent).toLocaleString()} บาท</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-12">
+                            <small className="text-muted">
+                                <i className="fas fa-clock me-1"></i>
+                                อัพเดตล่าสุด: {new Date(customer.updatedAt).toLocaleString('th-TH')}
+                            </small>
                         </div>
                     </div>
                 </div>
@@ -299,7 +353,11 @@ function DetailCustomer() {
                 <li className="nav-item">
                     <button 
                         className={`nav-link ${activeTab === 'points' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('points')}
+                        onClick={() => {
+                            setActiveTab('points');
+                            // รีเฟรชข้อมูลลูกค้าแบบเงียบๆ ไม่แจ้งเตือน
+                            loadCustomerData(customer.id);
+                        }}
                     >
                         ประวัติการใช้แต้ม
                     </button>
@@ -352,7 +410,7 @@ function DetailCustomer() {
                                                 }>
                                                     {transaction.transactionType === 'REDEEM_REWARD' ||
                                                      transaction.transactionType === 'DISCOUNT'
-                                                        ? `-${transaction.points}`
+                                                        ? `${transaction.points}`
                                                         : `+${transaction.points}`}
                                                 </td>
                                             </tr>

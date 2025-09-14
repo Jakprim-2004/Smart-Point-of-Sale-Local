@@ -390,7 +390,12 @@ function Sale() {
         setShowEndSaleModal(false);
 
         // รีเฟรชข้อมูล
-        await Promise.all([openBill(), fetchBillSaleDetail(), fetchData()]);
+        await Promise.all([
+          openBill(), 
+          fetchBillSaleDetail(), 
+          fetchData(),
+          loadCustomers() // เพิ่มการรีเฟรชข้อมูลลูกค้า
+        ]);
 
         // รอสักครู่แล้วพิมพ์บิล
         setTimeout(async () => {
@@ -727,7 +732,12 @@ function Sale() {
         setShowEndSaleModal(false);
 
         // รีเฟรชข้อมูล
-        await Promise.all([openBill(), fetchBillSaleDetail(), fetchData()]);
+        await Promise.all([
+          openBill(), 
+          fetchBillSaleDetail(), 
+          fetchData(),
+          loadCustomers() // เพิ่มการรีเฟรชข้อมูลลูกค้า
+        ]);
 
         // รอสักครู่แล้วพิมพ์บิล
         setTimeout(async () => {
@@ -790,9 +800,27 @@ function Sale() {
   };
 
   // ฟังก์ชันเลือกลูกค้า
-  const selectCustomer = (customer) => {
-    setSelectedCustomer(customer);
-    setCustomerSearchText(customer.name + " - " + customer.phone);
+  const selectCustomer = async (customer) => {
+    // รีเฟรชข้อมูลลูกค้าล่าสุดก่อนการเลือก
+    try {
+      const response = await axios.get(
+        config.api_path + `/customer/${customer.id}`,
+        config.headers()
+      );
+      if (response.data.result) {
+        const updatedCustomer = response.data.result;
+        setSelectedCustomer(updatedCustomer);
+        setCustomerSearchText(updatedCustomer.name + " - " + updatedCustomer.phone);
+      } else {
+        setSelectedCustomer(customer);
+        setCustomerSearchText(customer.name + " - " + customer.phone);
+      }
+    } catch (error) {
+      console.error("Error refreshing customer data:", error);
+      setSelectedCustomer(customer);
+      setCustomerSearchText(customer.name + " - " + customer.phone);
+    }
+    
     setShowCustomerDropdown(false);
     setFilteredCustomers([]);
     setHasIncompletePhone(false); // รีเซ็ตสถานะเบอร์โทรไม่ครบ
@@ -2772,16 +2800,7 @@ function Sale() {
                   >
                     {parseInt(item.price).toLocaleString("th-TH")}
                   </td>
-                  <td
-                    style={{
-                      textAlign: "right",
-                      paddingLeft: "8px",
-                      paddingTop: "2px",
-                      paddingBottom: "2px",
-                    }}
-                  >
-                    {parseInt(item.qty * item.price).toLocaleString("th-TH")}
-                  </td>
+                  
                 </tr>
               ))}
             </tbody>
