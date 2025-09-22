@@ -113,8 +113,8 @@ function Category() {
       icon: "warning",
       showCancelButton: true,
       showConfirmButton: true,
-      confirmButtonText: "Confirm",
-      cancelButtonText: "Cancel",
+      confirmButtonText: "ยืนยัน",
+      cancelButtonText: "ยกเลิก",
       confirmButtonColor: '#f44336',
       customClass: {
         confirmButton: 'btn btn-danger mx-2 px-4',
@@ -468,7 +468,7 @@ function Category() {
               ชื่อหมวดหมู่ต้องไม่เกิน 100 ตัวอักษร และไม่ซ้ำกับที่มีอยู่แล้ว
             </small>
           </div>
-          <div className="d-flex justify-content-end">
+          <div className="d-flex ">
             <button
               type="button"
               className="btn btn-secondary mr-2"
@@ -479,7 +479,7 @@ function Category() {
             >
               <i className="fa fa-times mr-2"></i>ยกเลิก
             </button>
-            <button type="submit" className="btn btn-primary">
+            <button type="submit" className="btn btn-success">
               <i className="fa fa-save mr-2"></i>บันทึก
             </button>
           </div>

@@ -449,7 +449,7 @@ function Sale() {
             type: "html",
             targetStyles: ["*"],
             documentTitle: "Receipt",
-            maxWidth: 300,
+            maxWidth: 330,
             onLoadingEnd: () => {
               slip.style.display = "none";
             },
@@ -975,8 +975,8 @@ function Sale() {
       text: "คุณต้องการลบสินค้าทั้งหมดในตะกร้าใช่หรือไม่?",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Confirm",
-      cancelButtonText: "Cancel",
+      confirmButtonText: "ยืนยัน",
+      cancelButtonText: "ยกเลิก",
       confirmButtonColor: '#f44336', // red color
       cancelButtonColor: '#6c757d', // gray color
       buttonsStyling: false,
@@ -2726,7 +2726,7 @@ function Sale() {
         id="slip"
         style={{
           display: "none",
-          width: "320px",
+          width: "80mm",
           fontFamily: "'Kanit', sans-serif",
           fontSize: "13px",
           lineHeight: "1.6",

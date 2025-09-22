@@ -81,8 +81,8 @@ const Sidebar = forwardRef((props, sidebarRef) => {
       imageHeight: 200,
       showCancelButton: true,
       showConfirmButton: true,
-      confirmButtonText: "Confirm",
-      cancelButtonText: "Cancel",
+      confirmButtonText: "ยืนยัน",
+      cancelButtonText: "ยกเลิก",
       confirmButtonColor: '#f44336',   // Red color
       customClass: {
         confirmButton: 'btn btn-danger mx-2 px-4',

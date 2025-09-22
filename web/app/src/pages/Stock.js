@@ -416,8 +416,8 @@ function Stock() {
         icon: "warning",
       showCancelButton: true,
       showConfirmButton: true,
-      confirmButtonText: "Confirm",
-      cancelButtonText: "Cancel",
+      confirmButtonText: "ยืนยัน",
+      cancelButtonText: "ยกเลิก",
       confirmButtonColor: '#f44336'   // Red color
     }).then(async (result) => {
       if (result.isConfirmed) {
@@ -686,7 +686,7 @@ function Stock() {
                                         onClick={() =>
                                           handleAddSingleProduct(product)
                                         }
-                                        className="btn btn-primary btn-sm"
+                                        className="btn btn-success btn-sm"
                                         title="คลิกเพื่อระบุจำนวนและเพิ่มเข้าสต็อก"
                                       >
                                         <i className="fas fa-plus me-1"></i>
@@ -1201,16 +1201,16 @@ function Stock() {
           </table>
         </div>
 
-        <div className="d-flex justify-content-end gap-2 mt-3">
+        <div className="d-flex  gap-2 mt-3">
           <button
             onClick={() => setShowBulkAddModal(false)}
             className="btn btn-secondary"
           >
             ยกเลิก
           </button>
-          <button onClick={handleSaveBulkAdd} className="btn btn-primary">
+          <button onClick={handleSaveBulkAdd} className="btn btn-success">
             <i className="fas fa-save me-2"></i>
-            บันทึกทั้งหมด
+            บันทึก
           </button>
         </div>
       </Modal>

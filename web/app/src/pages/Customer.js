@@ -350,7 +350,7 @@ function Customer() {
                                     <td>
                                         {editCustomer?.id === customer.id ? (
                                             <button className="btn btn-success me-2" onClick={handleSave}>
-                                                บันทึก
+                                                บันทึกข้อมูล
                                             </button>
                                         ) : (
                                             <div className="d-flex gap-2">

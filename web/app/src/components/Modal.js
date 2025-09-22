@@ -32,7 +32,7 @@ function Modal({ show, onHide, title, children, modalSize = '' }) {
                 data-bs-backdrop="static"
                 data-bs-keyboard="false"
             >
-                <div className={`modal-dialog ${modalSize} modal-dialog-scrollable modal-dialog-centered`}>
+                <div className={`modal-dialog ${modalSize} modal-dialog-centered`}>
                     <div className="modal-content">
                         <div className="modal-header">
                             <h5 className="modal-title">{title}</h5>

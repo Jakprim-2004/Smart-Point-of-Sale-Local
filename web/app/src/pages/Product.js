@@ -46,7 +46,9 @@ function Product() {
             const mainImage = imageRes.data.results.find((img) => img.isMain);
             return {
               ...product,
-              mainImageUrl: mainImage ? `${config.api_path}${mainImage.imageUrl}` : null,
+              mainImageUrl: mainImage
+                ? `${config.api_path}${mainImage.imageUrl}`
+                : null,
             };
           })
         );
@@ -246,15 +248,17 @@ function Product() {
       title: "ลบข้อมูล",
       text: `ยืนยันการลบ ${item.name || "รายการนี้"} จากรายการสินค้า`,
       icon: "warning",
-      showCancelButton: true,
       showConfirmButton: true,
-      confirmButtonText: "Confirm",
-      cancelButtonText: "Cancel",
-      confirmButtonColor: '#f44336',   // Red color
+      showCancelButton: true,
+
+      cancelButtonText: "ยกเลิก",
+      confirmButtonText: "ยืนยัน",
+
+      confirmButtonColor: "#f44336", // Red color
       customClass: {
-        confirmButton: 'btn btn-danger mx-2 px-4',
-        cancelButton: 'btn btn-secondary mx-2 px-4'
-      }
+        confirmButton: "btn btn-danger mx-2 px-4",
+        cancelButton: "btn btn-secondary mx-2 px-4",
+      },
     }).then(async (res) => {
       if (res.isConfirmed) {
         try {
@@ -320,7 +324,7 @@ function Product() {
       showConfirmButton: false,
       didOpen: () => {
         Swal.showLoading();
-      }
+      },
     });
 
     try {
@@ -354,14 +358,14 @@ function Product() {
             config.headers()
           );
           const mainImage = imageRes.data.results.find((img) => img.isMain);
-          const newImageUrl = mainImage ? `${config.api_path}${mainImage.imageUrl}` : null;
-          
+          const newImageUrl = mainImage
+            ? `${config.api_path}${mainImage.imageUrl}`
+            : null;
+
           // อัปเดตสินค้าในรายการ
-          setProducts(prevProducts => 
-            prevProducts.map(p => 
-              p.id === product.id 
-                ? { ...p, mainImageUrl: newImageUrl }
-                : p
+          setProducts((prevProducts) =>
+            prevProducts.map((p) =>
+              p.id === product.id ? { ...p, mainImageUrl: newImageUrl } : p
             )
           );
         } catch (error) {
@@ -374,7 +378,7 @@ function Product() {
           text: "อัปโหลดภาพสินค้าเรียบร้อยแล้ว",
           icon: "success",
           timer: 1000,
-          showConfirmButton: false
+          showConfirmButton: false,
         });
       }
     } catch (e) {
@@ -394,7 +398,7 @@ function Product() {
         config.headers()
       );
       if (res.data.message === "success") {
-        res.data.results.forEach((img) => { });
+        res.data.results.forEach((img) => {});
         setProductImages(res.data.results);
       }
     } catch (e) {
@@ -426,7 +430,7 @@ function Product() {
       if (res.data.message === "success") {
         // อัปเดตรูปภาพในโมดัล
         fetchDataProductImage({ id: item.productId });
-        
+
         // อัปเดตรูปภาพหลักในรายการสินค้าทันที
         try {
           const imageRes = await axios.get(
@@ -434,20 +438,20 @@ function Product() {
             config.headers()
           );
           const mainImage = imageRes.data.results.find((img) => img.isMain);
-          const newImageUrl = mainImage ? `${config.api_path}${mainImage.imageUrl}` : null;
-          
+          const newImageUrl = mainImage
+            ? `${config.api_path}${mainImage.imageUrl}`
+            : null;
+
           // อัปเดตสินค้าในรายการ
-          setProducts(prevProducts => 
-            prevProducts.map(p => 
-              p.id === item.productId 
-                ? { ...p, mainImageUrl: newImageUrl }
-                : p
+          setProducts((prevProducts) =>
+            prevProducts.map((p) =>
+              p.id === item.productId ? { ...p, mainImageUrl: newImageUrl } : p
             )
           );
         } catch (error) {
           console.error("Error updating main image in list:", error);
         }
-        
+
         Swal.fire({
           title: "เลือกภาพหลัก",
           text: "บันทึกการเลือกภาพหลักของสินค้าแล้ว",
@@ -471,9 +475,10 @@ function Product() {
       icon: "warning",
       showCancelButton: true,
       showConfirmButton: true,
-      confirmButtonText: "Confirm",
-      cancelButtonText: "Cancel",
-      confirmButtonColor: '#f44336'   // Red color
+      cancelButtonText: "ยกเลิก",
+      confirmButtonText: "ยืนยัน",
+
+      confirmButtonColor: "#f44336", // Red color
     }).then(async (res) => {
       if (res.isConfirmed) {
         try {
@@ -484,7 +489,7 @@ function Product() {
           if (res.data.message === "success") {
             // อัปเดตรูปภาพในโมดัล
             fetchDataProductImage({ id: item.productId });
-            
+
             // อัปเดตรูปภาพในรายการสินค้าทันที
             try {
               const imageRes = await axios.get(
@@ -492,20 +497,25 @@ function Product() {
                 config.headers()
               );
               const mainImage = imageRes.data.results.find((img) => img.isMain);
-              const newImageUrl = mainImage ? `${config.api_path}${mainImage.imageUrl}` : null;
-              
+              const newImageUrl = mainImage
+                ? `${config.api_path}${mainImage.imageUrl}`
+                : null;
+
               // อัปเดตสินค้าในรายการ
-              setProducts(prevProducts => 
-                prevProducts.map(p => 
-                  p.id === item.productId 
+              setProducts((prevProducts) =>
+                prevProducts.map((p) =>
+                  p.id === item.productId
                     ? { ...p, mainImageUrl: newImageUrl }
                     : p
                 )
               );
             } catch (error) {
-              console.error("Error updating product image after delete:", error);
+              console.error(
+                "Error updating product image after delete:",
+                error
+              );
             }
-            
+
             Swal.fire({
               title: "ลบภาพสินค้า",
               text: "ลบภาพสินค้าออกจากระบบแล้ว",
@@ -805,12 +815,18 @@ function Product() {
                       const totalPages = Math.ceil(totalItems / itemsPerPage);
                       const startIndex = (currentPage - 1) * itemsPerPage;
                       const endIndex = startIndex + itemsPerPage;
-                      const currentItems = filteredProducts.slice(startIndex, endIndex);
+                      const currentItems = filteredProducts.slice(
+                        startIndex,
+                        endIndex
+                      );
 
                       if (currentItems.length === 0) {
                         return (
                           <tr>
-                            <td colSpan="8" className="text-center text-muted py-4">
+                            <td
+                              colSpan="8"
+                              className="text-center text-muted py-4"
+                            >
                               <i className="fa fa-search mb-2 fa-2x"></i>
                               <p>ไม่พบสินค้าที่ค้นหา</p>
                             </td>
@@ -825,7 +841,10 @@ function Product() {
                         return (
                           <tr key={item.id} className="align-middle">
                             <td className="py-2 text-center">
-                              <span className="badge badge-secondary mr-2" style={{ fontSize: '12px' }}>
+                              <span
+                                className="badge badge-secondary mr-2"
+                                style={{ fontSize: "12px" }}
+                              >
                                 {displayIndex}
                               </span>
                               {item.mainImageUrl ? (
@@ -863,7 +882,9 @@ function Product() {
                               {parseInt(item.price).toLocaleString("th-TH")} ฿
                             </td>
                             <td className="py-2">
-                              <span className=" px-3 py-2">{item.category}</span>
+                              <span className=" px-3 py-2">
+                                {item.category}
+                              </span>
                             </td>
                             <td className="py-2">
                               <span className="">{item.units_of_measure}</span>
@@ -901,7 +922,9 @@ function Product() {
                                   <i className="fa fa-trash"></i>
                                 </button>
                                 <button
-                                  onClick={() => handlePrintBarcode(item.barcode)}
+                                  onClick={() =>
+                                    handlePrintBarcode(item.barcode)
+                                  }
                                   className="btn btn-secondary btn-sm"
                                   title="พิมพ์บาร์โค้ด"
                                 >
@@ -943,14 +966,19 @@ function Product() {
                 <div className="d-flex justify-content-between align-items-center mt-4">
                   <div className="text-muted">
                     <small>
-                      แสดงรายการที่ {startIndex + 1} - {endIndex} จากทั้งหมด {totalItems} รายการ
+                      แสดงรายการที่ {startIndex + 1} - {endIndex} จากทั้งหมด{" "}
+                      {totalItems} รายการ
                     </small>
                   </div>
 
                   {totalPages > 1 && (
                     <nav aria-label="Product pagination">
                       <ul className="pagination pagination-sm mb-0">
-                        <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                        <li
+                          className={`page-item ${
+                            currentPage === 1 ? "disabled" : ""
+                          }`}
+                        >
                           <button
                             className="page-link"
                             onClick={() => setCurrentPage(currentPage - 1)}
@@ -965,7 +993,10 @@ function Product() {
                         {currentPage > 3 && (
                           <>
                             <li className="page-item">
-                              <button className="page-link" onClick={() => setCurrentPage(1)}>
+                              <button
+                                className="page-link"
+                                onClick={() => setCurrentPage(1)}
+                              >
                                 1
                               </button>
                             </li>
@@ -978,31 +1009,40 @@ function Product() {
                         )}
 
                         {/* แสดงหน้าปัจจุบันและข้างเคียง */}
-                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                          let pageNum;
-                          if (totalPages <= 5) {
-                            pageNum = i + 1;
-                          } else if (currentPage <= 3) {
-                            pageNum = i + 1;
-                          } else if (currentPage >= totalPages - 2) {
-                            pageNum = totalPages - 4 + i;
-                          } else {
-                            pageNum = currentPage - 2 + i;
-                          }
+                        {Array.from(
+                          { length: Math.min(5, totalPages) },
+                          (_, i) => {
+                            let pageNum;
+                            if (totalPages <= 5) {
+                              pageNum = i + 1;
+                            } else if (currentPage <= 3) {
+                              pageNum = i + 1;
+                            } else if (currentPage >= totalPages - 2) {
+                              pageNum = totalPages - 4 + i;
+                            } else {
+                              pageNum = currentPage - 2 + i;
+                            }
 
-                          if (pageNum < 1 || pageNum > totalPages) return null;
+                            if (pageNum < 1 || pageNum > totalPages)
+                              return null;
 
-                          return (
-                            <li key={pageNum} className={`page-item ${currentPage === pageNum ? 'active' : ''}`}>
-                              <button
-                                className="page-link"
-                                onClick={() => setCurrentPage(pageNum)}
+                            return (
+                              <li
+                                key={pageNum}
+                                className={`page-item ${
+                                  currentPage === pageNum ? "active" : ""
+                                }`}
                               >
-                                {pageNum}
-                              </button>
-                            </li>
-                          );
-                        })}
+                                <button
+                                  className="page-link"
+                                  onClick={() => setCurrentPage(pageNum)}
+                                >
+                                  {pageNum}
+                                </button>
+                              </li>
+                            );
+                          }
+                        )}
 
                         {/* แสดงหน้าสุดท้าย */}
                         {currentPage < totalPages - 2 && (
@@ -1013,14 +1053,21 @@ function Product() {
                               </li>
                             )}
                             <li className="page-item">
-                              <button className="page-link" onClick={() => setCurrentPage(totalPages)}>
+                              <button
+                                className="page-link"
+                                onClick={() => setCurrentPage(totalPages)}
+                              >
                                 {totalPages}
                               </button>
                             </li>
                           </>
                         )}
 
-                        <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                        <li
+                          className={`page-item ${
+                            currentPage === totalPages ? "disabled" : ""
+                          }`}
+                        >
                           <button
                             className="page-link"
                             onClick={() => setCurrentPage(currentPage + 1)}
@@ -1040,96 +1087,96 @@ function Product() {
         </div>
 
         <style jsx>{`
-        @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap");
-      
-        body,
-        .card,
-        .btn,
-        .form-control,
-        .table,
-        input,
-        select,
-        textarea,
-        label,
-        .modal,
-        .modal-header,
-        .modal-body,
-        .modal-footer,
-        .form-group,
-        .input-group,
-        .custom-file-label,
-        .alert,
-        .badge,
-        .dropdown-menu,
-        .pagination,
-        .nav,
-        .breadcrumb {
-          font-family: "Kanit", sans-serif !important;
-        }
-      
-        .card-title {
-          font-family: "Kanit", sans-serif !important;
-          font-weight: 600 !important;
-        }
-      
-        .table th {
-          font-family: "Kanit", sans-serif !important;
-          font-weight: 700 !important;
-          color: #212529 !important;
-          background: #f1f3f6 !important;
-          vertical-align: middle !important;
-          font-size: 16px !important;
-        }
-      
-        .table td {
-          vertical-align: middle !important;
-          color: #333 !important;
-        }
-      
-        .table {
-          margin-bottom: 0;
-        }
-      
-        .btn,
-        .badge {
-          font-size: 15px;
-        }
-      
-        .badge {
-          font-weight: normal;
-        }
-      
-        .btn-group .btn {
-          transition: all 0.2s;
-        }
-      
-        .btn-group .btn:hover {
-          transform: translateY(-2px);
-        }
-      
-        .pagination .page-link {
-          font-family: "Kanit", sans-serif !important;
-          font-size: 14px !important;
-          border-radius: 6px !important;
-          margin: 0 2px !important;
-          border: 1px solid #dee2e6 !important;
-        }
-      
-        .pagination .page-item.active .page-link {
-          background-color: #007bff !important;
-          border-color: #007bff !important;
-        }
-      
-        .pagination .page-link:hover {
-          background-color: #e9ecef !important;
-          border-color: #dee2e6 !important;
-          color: #007bff !important;
-        }
-      
-        .hover-scale:hover {
-          transform: scale(1.02);
-        }
-      `}</style>
+          @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap");
+
+          body,
+          .card,
+          .btn,
+          .form-control,
+          .table,
+          input,
+          select,
+          textarea,
+          label,
+          .modal,
+          .modal-header,
+          .modal-body,
+          .modal-footer,
+          .form-group,
+          .input-group,
+          .custom-file-label,
+          .alert,
+          .badge,
+          .dropdown-menu,
+          .pagination,
+          .nav,
+          .breadcrumb {
+            font-family: "Kanit", sans-serif !important;
+          }
+
+          .card-title {
+            font-family: "Kanit", sans-serif !important;
+            font-weight: 600 !important;
+          }
+
+          .table th {
+            font-family: "Kanit", sans-serif !important;
+            font-weight: 700 !important;
+            color: #212529 !important;
+            background: #f1f3f6 !important;
+            vertical-align: middle !important;
+            font-size: 16px !important;
+          }
+
+          .table td {
+            vertical-align: middle !important;
+            color: #333 !important;
+          }
+
+          .table {
+            margin-bottom: 0;
+          }
+
+          .btn,
+          .badge {
+            font-size: 15px;
+          }
+
+          .badge {
+            font-weight: normal;
+          }
+
+          .btn-group .btn {
+            transition: all 0.2s;
+          }
+
+          .btn-group .btn:hover {
+            transform: translateY(-2px);
+          }
+
+          .pagination .page-link {
+            font-family: "Kanit", sans-serif !important;
+            font-size: 14px !important;
+            border-radius: 6px !important;
+            margin: 0 2px !important;
+            border: 1px solid #dee2e6 !important;
+          }
+
+          .pagination .page-item.active .page-link {
+            background-color: #007bff !important;
+            border-color: #007bff !important;
+          }
+
+          .pagination .page-link:hover {
+            background-color: #e9ecef !important;
+            border-color: #dee2e6 !important;
+            color: #007bff !important;
+          }
+
+          .hover-scale:hover {
+            transform: scale(1.02);
+          }
+        `}</style>
 
         {/* โมดัลรูปภาพสินค้า */}
         <Modal
@@ -1183,7 +1230,8 @@ function Product() {
               {productImages.length > 0 && (
                 <div className="alert alert-info">
                   <i className="fa fa-info-circle mr-2"></i>
-                  สินค้านี้มีรูปภาพแล้ว หากต้องการเปลี่ยนรูป กรุณาลบรูปภาพเดิมก่อน
+                  สินค้านี้มีรูปภาพแล้ว หากต้องการเปลี่ยนรูป
+                  กรุณาลบรูปภาพเดิมก่อน
                 </div>
               )}
 
@@ -1208,12 +1256,14 @@ function Product() {
               {productImage.name !== undefined &&
                 imagePreview &&
                 productImages.length === 0 && (
-                  <button
-                    onClick={handleUpload}
-                    className="btn btn-primary shadow-sm"
-                  >
-                    <i className="fa fa-cloud-upload mr-2"></i> อัพโหลดรูปภาพ
-                  </button>
+                  <div className="d-flex justify-content-end">
+                    <button
+                      onClick={handleUpload}
+                      className="btn btn-primary shadow-sm"
+                    >
+                      <i className="fa fa-cloud-upload mr-2"></i> อัพโหลดรูปภาพ
+                    </button>
+                  </div>
                 )}
             </div>
 
@@ -1227,8 +1277,9 @@ function Product() {
                         <img
                           className="card-img-top"
                           src={
-                            item.imageUrl ? `${config.api_path}${item.imageUrl}` :
-                              "https://via.placeholder.com/300x200?text=No+Image"
+                            item.imageUrl
+                              ? `${config.api_path}${item.imageUrl}`
+                              : "https://via.placeholder.com/300x200?text=No+Image"
                           }
                           width="100%"
                           alt=""
@@ -1236,9 +1287,15 @@ function Product() {
                             e.target.src =
                               "https://via.placeholder.com/300x200?text=No+Image";
                           }}
-                          onLoad={() => { }}
+                          onLoad={() => {}}
                         />
                         <div className="card-body text-center">
+                          <button
+                            onClick={() => handleDeleteProductImage(item)}
+                            className="btn btn-danger btn-sm shadow-sm mr-2"
+                          >
+                            <i className="fa fa-times"></i>
+                          </button>
                           {item.isMain ? (
                             <button className="btn btn-success btn-sm mr-2 shadow-sm ">
                               ภาพหลัก
@@ -1251,12 +1308,6 @@ function Product() {
                               ภาพหลัก
                             </button>
                           )}
-                          <button
-                            onClick={() => handleDeleteProductImage(item)}
-                            className="btn btn-danger btn-sm shadow-sm"
-                          >
-                            <i className="fa fa-times"></i>
-                          </button>
                         </div>
                       </div>
                     </div>
@@ -1464,16 +1515,18 @@ function Product() {
               </div>
             </div>
 
-            <div className="text-muted mb-3">
-              <small>
+            <div className="text-muted mb-3 ">
+              <small ca>
                 หมายเหตุ: ช่องที่มีเครื่องหมาย{" "}
                 <span className="text-danger">*</span> จำเป็นต้องกรอก
               </small>
             </div>
 
-            <button type="submit" className="btn btn-success shadow-sm">
-              <i className="fa fa-save mr-2"></i>บันทึกข้อมูล
-            </button>
+            <div className="d-flex">
+              <button type="submit" className="btn btn-success shadow-sm">
+                <i className="fa fa-save mr-2"></i>บันทึกข้อมูล
+              </button>
+            </div>
           </form>
         </Modal>
       </Template>

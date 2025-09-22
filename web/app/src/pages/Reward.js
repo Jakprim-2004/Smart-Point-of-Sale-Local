@@ -500,7 +500,7 @@ function Reward() {
         title="เพิ่มของรางวัลใหม่"
       >
         <form onSubmit={handleCreateReward}>
-          <div className="modal-body">
+          <div className="modal-body" style={{overflow: 'hidden', maxHeight: '350px'}}>
             <div className="mb-3">
               <label className="form-label">
                 ชื่อของรางวัล <span className="text-danger">*</span>
@@ -565,7 +565,7 @@ function Reward() {
             >
               ยกเลิก
             </button>
-            <button type="submit" className="btn btn-primary">
+            <button type="submit" className="btn btn-success px-4 py-2">
               บันทึก
             </button>
           </div>
@@ -578,7 +578,7 @@ function Reward() {
         title="แก้ไขของรางวัล"
       >
         <form onSubmit={handleUpdateReward}>
-          <div className="modal-body">
+          <div className="modal-body" style={{overflow: 'hidden', maxHeight: '350px'}}>
             <div className="mb-3">
               <label className="form-label">ชื่อของรางวัล</label>
               <input
