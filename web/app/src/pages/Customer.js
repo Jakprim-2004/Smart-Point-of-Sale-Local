@@ -287,7 +287,7 @@ function Customer() {
                                         </div>
                                         
                                     </div>
-                                    <button type="submit" className="btn btn-success">บันทึกข้อมูล</button>
+                                    <button type="submit" className="btn btn-success">บันทึก</button>
                                 </form>
                             </div>
                         </div>
@@ -350,7 +350,7 @@ function Customer() {
                                     <td>
                                         {editCustomer?.id === customer.id ? (
                                             <button className="btn btn-success me-2" onClick={handleSave}>
-                                                บันทึกข้อมูล
+                                                บันทึก
                                             </button>
                                         ) : (
                                             <div className="d-flex gap-2">

@@ -4,7 +4,6 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import config from "../config";
 import Modal from "../components/Modal";
-import * as dayjs from "dayjs";
 import PrintJS from "print-js";
 import Barcode from "../components/Barcode";
 import { QRCodeSVG } from "qrcode.react";
@@ -21,14 +20,14 @@ function Sale() {
   const [inputMoney, setInputMoney] = useState(0);
   const [lastBill, setLastBill] = useState({});
   const [billToday, setBillToday] = useState([]);
-  const [selectedBill, setSelectedBill] = useState({});
+  const [selectedBill, ] = useState({});
   const [memberInfo, setMemberInfo] = useState({});
-  const [sumTotal, setSumTotal] = useState(0);
+  const [ setSumTotal] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter] = useState("ทั้งหมด");
   const [paymentMethod, setPaymentMethod] = useState("Cash");
   const [heldBills, setHeldBills] = useState([]);
-  const [showQR, setShowQR] = useState(false);
+  const [ setShowQR] = useState(false);
   const promptPayNumber = "0656922937"; // หมายเลขพร้อมเพย์
   const [customers, setCustomers] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -48,7 +47,7 @@ function Sale() {
   const [showSplitPaymentModal, setShowSplitPaymentModal] = useState(false);
   const [cashAmount, setCashAmount] = useState(0);
   const [transferAmount, setTransferAmount] = useState(0);
-  const [isSplitPayment, setIsSplitPayment] = useState(false);
+  const [ setIsSplitPayment] = useState(false);
 
   // Pagination states
   const [visibleItemCount, setVisibleItemCount] = useState(30);
@@ -391,8 +390,8 @@ function Sale() {
 
         // รีเฟรชข้อมูล
         await Promise.all([
-          openBill(), 
-          fetchBillSaleDetail(), 
+          openBill(),
+          fetchBillSaleDetail(),
           fetchData(),
           loadCustomers() // เพิ่มการรีเฟรชข้อมูลลูกค้า
         ]);
@@ -733,8 +732,8 @@ function Sale() {
 
         // รีเฟรชข้อมูล
         await Promise.all([
-          openBill(), 
-          fetchBillSaleDetail(), 
+          openBill(),
+          fetchBillSaleDetail(),
           fetchData(),
           loadCustomers() // เพิ่มการรีเฟรชข้อมูลลูกค้า
         ]);
@@ -820,7 +819,7 @@ function Sale() {
       setSelectedCustomer(customer);
       setCustomerSearchText(customer.name + " - " + customer.phone);
     }
-    
+
     setShowCustomerDropdown(false);
     setFilteredCustomers([]);
     setHasIncompletePhone(false); // รีเซ็ตสถานะเบอร์โทรไม่ครบ
@@ -1167,7 +1166,7 @@ function Sale() {
                               </div>
                               <div className="product-barcode">
                                 <Barcode
-                                   value={item.barcode}
+                                  value={item.barcode}
                                   width={1}
                                   height={25}
                                   fontSize={10}
@@ -1933,9 +1932,9 @@ function Sale() {
                 handleAddToBill();
                 setShowQtyModal(false);
               }}
-              className="btn btn-primary"
+              className="btn btn-success"
             >
-              <i className="fa fa-check me-2"></i>เพิ่มลงบิล
+              เพิ่มลงบิล
             </button>
           </div>
         </div>
@@ -1954,16 +1953,15 @@ function Sale() {
             <div className="input-group position-relative">
               <input
                 type="text"
-                className={`form-control ${
-                  customerSearchText && isIncompletePhoneNumber(customerSearchText) 
-                    ? 'border-warning' 
+                className={`form-control ${customerSearchText && isIncompletePhoneNumber(customerSearchText)
+                    ? 'border-warning'
                     : ''
-                }`}
+                  }`}
                 placeholder="ค้นหาด้วยชื่อหรือเบอร์โทร (เบอร์โทร 10 หลัก)..."
                 value={customerSearchText}
                 onChange={(e) => {
                   let value = e.target.value;
-                  
+
                   // ถ้าเป็นตัวเลขทั้งหมด ให้จำกัดที่ 10 หลัก
                   if (/^\d+$/.test(value)) {
                     if (value.length <= 10) {
@@ -1982,7 +1980,7 @@ function Sale() {
                     setShowCustomerDropdown(value.length > 0);
                     setHasIncompletePhone(false);
                   }
-                  
+
                   // รีเซ็ตสถานะเบอร์ไม่ครบเมื่อล้างข้อมูล
                   if (value.length === 0) {
                     setHasIncompletePhone(false);
@@ -2511,18 +2509,18 @@ function Sale() {
               <span style={{ flex: 1, textAlign: "right" }}>
                 {(() => {
                   if (!selectedBill?.billSaleDetails) return "0 บาท";
-                  
+
                   const totalBeforeDiscount = selectedBill.billSaleDetails.reduce(
                     (sum, item) => sum + parseFloat(item.qty) * parseFloat(item.price),
                     0
                   );
-                  
+
                   let discount = 0;
                   if (selectedBill.description && selectedBill.description.includes("ใช้แต้มสะสม")) {
                     const match = selectedBill.description.match(/ส่วนลด (\d+) บาท/);
                     discount = match ? parseInt(match[1]) : 0;
                   }
-                  
+
                   const netTotal = totalBeforeDiscount - discount;
                   return `${netTotal.toLocaleString("th-TH")} บาท`;
                 })()}
@@ -2724,83 +2722,44 @@ function Sale() {
 
       <div
         id="slip"
+        className="print-slip"
         style={{
           display: "none",
-          width: "80mm",
-          fontFamily: "'Kanit', sans-serif",
-          fontSize: "13px",
-          lineHeight: "1.6",
-          color: "#222",
+          width: "45mm",
+          margin: 0,
+          padding: 0,
         }}
       >
-         <div>
+        <div className="print-slip__content" style={{width: "100%", padding: 0, margin: 0}}>
+          <div className="print-slip__header" style={{width: "100%", padding: 0, margin: 0}}>
             {(() => {
-              if (!lastBill?.payDate) return "วันที่ชำระเงิน " ;
+              if (!lastBill?.payDate) return "วันที่ชำระเงิน ";
 
               const date = new Date(lastBill.payDate);
               const formattedDate = date.toLocaleString('th-TH', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-              });
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false
+            });
               return `${formattedDate} น. `;
-            })()}
-            <div>เลขที่ใบเสร็จ <b>{lastBill?.id || "-"}</b></div>
+          })()}
+            <div >เลขที่ใบเสร็จ <b>{lastBill?.id || "-"}</b></div>
           </div>
-        <div style={{ padding: "10px" }}>
-          <hr style={{ border: "none", borderTop: "1px dashed #888" }} />
+          <div className="print-slip__body">
+            <hr style={{ border: "none", borderTop: "1px dashed #888", margin: 0 }} />
 
-          รายการสินค้า
+          <div style={{fontSize: "11px", margin: 0}}>รายการสินค้า</div>
           {/* Items Table */}
-          <table
-            style={{
-              width: "100%",
-              marginBottom: "8px",
-              borderCollapse: "separate",
-              borderSpacing: "0 2px",
-            }}
-          >
-
+          <table style={{width: "100%", margin: 0, borderCollapse: "collapse", borderSpacing: 0}}>
             <tbody>
               {lastBill?.billSaleDetails?.map((item, index) => (
                 <tr key={index}>
-                  <td
-                    style={{
-                      textAlign: "center",
-                      paddingLeft: "4px",
-                      paddingRight: "4px",
-                      paddingTop: "2px",
-                      paddingBottom: "2px",
-                    }}
-                  >
-                    {item.qty || 1}
-                  </td>
-                  <td
-                    style={{
-                      textAlign: "left",
-                      paddingRight: "8px",
-                      paddingTop: "2px",
-                      paddingBottom: "2px",
-                    }}
-                  >
-                    {item.product.name || "-"}
-                  </td>
-
-                  <td
-                    style={{
-                      textAlign: "right",
-                      paddingLeft: "8px",
-                      paddingRight: "8px",
-                      paddingTop: "2px",
-                      paddingBottom: "2px",
-                    }}
-                  >
-                    {parseInt(item.price).toLocaleString("th-TH")}
-                  </td>
-                  
+                  <td style={{textAlign: "center", padding: "2px 0", fontSize: "10px"}}> {item.qty || 1}</td>
+                  <td style={{textAlign: "left", padding: "2px 0", fontSize: "10px"}}> {item.product.name || "-"}</td>
+                  <td style={{textAlign: "right", padding: "2px 0", fontSize: "10px"}}> {parseInt(item.price).toLocaleString("th-TH")}</td>
                 </tr>
               ))}
             </tbody>
@@ -2810,18 +2769,19 @@ function Sale() {
           {/* ยอดรวมก่อนหักส่วนลด */}
           <div
             style={{
-              fontSize: "13px",
+              fontSize: "11px",
               display: "flex",
               justifyContent: "space-between",
               marginBottom: "4px",
               marginTop: "8px",
               width: "100%",
+              alignItems: "center"
             }}
           >
             <span style={{ flex: 1, textAlign: "left" }}>ยอดรวม</span>
-            <span style={{ flex: 1, textAlign: "right", paddingLeft: "20px" }}>
+            <span style={{ flex: 1, textAlign: "right", paddingLeft: "20px", whiteSpace: "nowrap" }}>
               {lastBill?.billSaleDetails
-                ? `${lastBill.billSaleDetails.reduce((sum, item) => sum + parseFloat(item.qty), 0)} ชิ้น / ${parseInt(
+                ? `${lastBill.billSaleDetails.reduce((sum, item) => sum + parseFloat(item.qty), 0)}ชิ้น/${parseInt(
                   lastBill.billSaleDetails.reduce(
                     (sum, item) =>
                       sum + parseFloat(item.qty) * parseFloat(item.price),
@@ -2836,16 +2796,16 @@ function Sale() {
           {lastBill?.description && lastBill.description.includes("ใช้แต้มสะสม") && (
             <div
               style={{
-                fontSize: "12px",
+                fontSize: "10px",
                 display: "flex",
                 justifyContent: "space-between",
                 marginBottom: "4px",
                 width: "100%",
-                
+                alignItems: "center"
               }}
             >
-              <span style={{ flex: 1, textAlign: "left" }}>ส่วนลดจากแต้ม</span>
-              <span style={{ flex: 1, textAlign: "right", paddingLeft: "20px" }}>
+              <span style={{ flex: 1, textAlign: "left", whiteSpace: "nowrap" }}>ส่วนลดจากแต้ม</span>
+              <span style={{ flex: 1, textAlign: "right", paddingLeft: "20px", whiteSpace: "nowrap" }}>
                 {(() => {
                   // ดึงจำนวนส่วนลดจาก description
                   const match = lastBill.description.match(/ส่วนลด (\d+) บาท/);
@@ -2858,36 +2818,36 @@ function Sale() {
           {/* ยอดสุทธิ (หลังหักส่วนลด) */}
           <div
             style={{
-              fontSize: "13px",
+              fontSize: "11px",
               display: "flex",
               justifyContent: "space-between",
               marginBottom: "8px",
               width: "100%",
-              fontWeight: "bold",
               borderTop: "1px dashed #888",
               paddingTop: "8px",
+              alignItems: "center"
             }}
           >
-            <span style={{ flex: 1, textAlign: "left" }}>ยอดสุทธิ</span>
-            <span style={{ flex: 1, textAlign: "right", paddingLeft: "20px" }}>
+            <span style={{ flex: 1, textAlign: "left", whiteSpace: "nowrap" }}>ยอดสุทธิ</span>
+            <span style={{ flex: 1, textAlign: "right", paddingLeft: "20px", whiteSpace: "nowrap" }}>
               {(() => {
-                if (!lastBill?.billSaleDetails) return "0.00 บาท";
-                
+                if (!lastBill?.billSaleDetails) return "0.00 ";
+
                 const totalBeforeDiscount = parseInt(
                   lastBill.billSaleDetails.reduce(
                     (sum, item) => sum + parseFloat(item.qty) * parseFloat(item.price),
                     0
                   )
                 );
-                
+
                 let discount = 0;
                 if (lastBill.description && lastBill.description.includes("ใช้แต้มสะสม")) {
-                  const match = lastBill.description.match(/ส่วนลด (\d+) บาท/);
+                  const match = lastBill.description.match(/ส่วนลด (\d+) /);
                   discount = match ? parseInt(match[1]) : 0;
                 }
-                
+
                 const netTotal = totalBeforeDiscount - discount;
-                return `${netTotal.toLocaleString("th-TH")}.00 บาท`;
+                return `${netTotal.toLocaleString("th-TH")}.00 `;
               })()}
             </span>
           </div>
@@ -2895,58 +2855,58 @@ function Sale() {
           {/* วิธีชำระ */}
           <div
             style={{
-              fontSize: "13px",
+              fontSize: "11px",
               display: "flex",
               justifyContent: "space-between",
               marginBottom: "8px",
               width: "100%",
+              alignItems: "center"
             }}
           >
-            <span style={{ flex: 1, textAlign: "left" }}>
+            <span style={{ flex: 1, textAlign: "left", whiteSpace: "nowrap" }}>
               {lastBill?.paymentMethod === "Cash" && "เงินสด"}
               {lastBill?.paymentMethod === "PromptPay" && "พร้อมเพย์"}
               {lastBill?.paymentMethod === "Transfer" && "โอนเงิน"}
               {lastBill?.paymentMethod === "Split" && "ชำระแบบผสม"}
             </span>
-            <span style={{ flex: 1, textAlign: "right", paddingLeft: "20px" }}>
+            <span style={{ flex: 1, textAlign: "right", paddingLeft: "20px", whiteSpace: "nowrap" }}>
               {(() => {
                 if (!lastBill?.billSaleDetails) return "0.00";
-                
+
                 const totalBeforeDiscount = parseInt(
                   lastBill.billSaleDetails.reduce(
                     (sum, item) => sum + parseFloat(item.qty) * parseFloat(item.price),
                     0
                   )
                 );
-                
+
                 let discount = 0;
                 if (lastBill.description && lastBill.description.includes("ใช้แต้มสะสม")) {
                   const match = lastBill.description.match(/ส่วนลด (\d+) บาท/);
                   discount = match ? parseInt(match[1]) : 0;
                 }
-                
+
                 const netTotal = totalBeforeDiscount - discount;
                 return `${netTotal.toLocaleString("th-TH")}.00`;
               })()}
             </span>
           </div>
-         
-           <div style={{ marginBottom: "8px" }}>
+
+          <div style={{ marginBottom: "8px", fontSize: "10px" }}>
             {(lastBill?.Customer?.idcustomers || memberInfo?.idcustomers) && (
               <div>
                 รหัสลูกค้า: {lastBill?.Customer?.idcustomers || memberInfo?.idcustomers}
               </div>
             )}
-           
-            
           </div>
           <div
-            style={{ textAlign: "center", marginTop: "10px", fontSize: "13px" }}
+            style={{ textAlign: "center", marginTop: "10px", fontSize: "10px" }}
           >
-            <p style={{ margin: "0" }}>*** ขอบคุณที่ใช้บริการ ***</p>
+            <p style={{ margin: "0" }}>ขอบคุณที่ใช้บริการ</p>
           </div>
         </div>
       </div>
+    </div>
     </>
   );
 }

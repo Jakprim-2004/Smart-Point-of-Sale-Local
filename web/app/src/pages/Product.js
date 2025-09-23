@@ -811,8 +811,6 @@ function Product() {
                       );
 
                       // คำนวณ pagination
-                      const totalItems = filteredProducts.length;
-                      const totalPages = Math.ceil(totalItems / itemsPerPage);
                       const startIndex = (currentPage - 1) * itemsPerPage;
                       const endIndex = startIndex + itemsPerPage;
                       const currentItems = filteredProducts.slice(
@@ -1256,7 +1254,7 @@ function Product() {
               {productImage.name !== undefined &&
                 imagePreview &&
                 productImages.length === 0 && (
-                  <div className="d-flex justify-content-end">
+                  <div className="d-flex justify-content-start">
                     <button
                       onClick={handleUpload}
                       className="btn btn-primary shadow-sm"
@@ -1524,7 +1522,7 @@ function Product() {
 
             <div className="d-flex">
               <button type="submit" className="btn btn-success shadow-sm">
-                <i className="fa fa-save mr-2"></i>บันทึกข้อมูล
+                <i className="fa fa-save mr-2"></i>บันทึก
               </button>
             </div>
           </form>

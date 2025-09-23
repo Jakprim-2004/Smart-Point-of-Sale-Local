@@ -643,7 +643,7 @@ function Reward() {
             >
               ยกเลิก
             </button>
-            <button type="submit" className="btn btn-primary">
+            <button type="submit" className="btn btn-success px-4 py-2">
               บันทึก
             </button>
           </div>
