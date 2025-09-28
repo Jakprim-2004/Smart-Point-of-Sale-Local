@@ -20,14 +20,15 @@ const BillSaleModel = conn.define("billSale", {
     type: DataTypes.BIGINT
   },
   paymentMethod: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(30),
     allowNull: false,
     defaultValue: "", 
   },
   description: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(255),
     allowNull: true
-  },  customerId: {
+  }, 
+  customerId: {
     type: DataTypes.INTEGER,
     allowNull: true,
     references: {

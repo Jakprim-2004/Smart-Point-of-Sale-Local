@@ -4,12 +4,12 @@ const CustomerModel = require('./CustomerModel');
 
 const PointTransactionModel = conn.define('PointTransaction', {
     id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.BIGINT,
         primaryKey: true,
         autoIncrement: true
     },
     customerId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.BIGINT,
         allowNull: false
     },
     points: {

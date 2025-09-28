@@ -15,10 +15,10 @@ const BillSaleDetailModel = conn.define("billSaleDetail", {
     type: DataTypes.BIGINT,
   },
   qty: {
-    type: DataTypes.BIGINT,
+    type: DataTypes.INTEGER,
   },
   price: {
-    type: DataTypes.BIGINT,
+    type: DataTypes.DECIMAL(10, 2),
   },
   userId: {
     type: DataTypes.BIGINT,

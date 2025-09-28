@@ -7,22 +7,22 @@ const ProductModel = conn.define('product', {
         primaryKey: true
     },
     barcode: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING(20)
     },
     name: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING(100)
     },
     cost: {
-        type: DataTypes.BIGINT
+        type: DataTypes.DECIMAL(10,2)
     },
     price: {
-        type: DataTypes.BIGINT
+        type: DataTypes.DECIMAL(10,2)
     },
     userId: {
         type: DataTypes.BIGINT
     },
     category: {
-        type: DataTypes.STRING
+        type: DataTypes.BIGINT
     },
     units_of_measure: {
         type: DataTypes.STRING

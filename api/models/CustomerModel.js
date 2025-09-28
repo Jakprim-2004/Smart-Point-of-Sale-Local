@@ -3,25 +3,25 @@ const { DataTypes } = require("sequelize");
 
 const CustomerModel = conn.define("Customer", {
     id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.BIGINT,
         primaryKey: true,
         autoIncrement: true
     },
     idcustomers: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.BIGINT,
         allowNull: false,
         unique: true
     },
     name: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.STRING(50),
         allowNull: false
     },
     phone: {
-        type: DataTypes.STRING(20),
+        type: DataTypes.STRING(15),
         allowNull: false
     },
     email: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.STRING(50),
         allowNull: true
     },
     points: {

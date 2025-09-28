@@ -8,7 +8,7 @@ const RewardModel = conn.define("Reward", {
         primaryKey: true,
     },
     name: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(100),
         allowNull: false
     },
     description: {

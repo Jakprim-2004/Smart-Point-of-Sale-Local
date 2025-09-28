@@ -10,13 +10,13 @@ const ProductImageModel = conn.define('productImage', {
         type: DataTypes.BIGINT
     },
     imageName: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING(255)
     },
     imageUrl: {
-        type: DataTypes.TEXT // เพิ่มฟิลด์สำหรับเก็บ Cloudinary URL
+        type: DataTypes.TEXT 
     },
     isMain: {
-        type: DataTypes.BOOLEAN
+        type: DataTypes.ENUM('TRUE', 'FALSE'),
     }
 })
 
