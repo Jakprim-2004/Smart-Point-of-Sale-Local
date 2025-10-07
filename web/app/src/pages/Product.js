@@ -20,6 +20,7 @@ function Product() {
   const [imagePreview, setImagePreview] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(30);
+  const [formErrors, setFormErrors] = useState({});
   const navigate = useNavigate();
 
   // เรียกข้อมูลเมื่อคอมโพเนนต์ถูกโหลด
@@ -104,27 +105,46 @@ function Product() {
   const handleSave = async (e) => {
     e.preventDefault();
 
+    // รีเซ็ต errors
+    setFormErrors({});
+    let errors = {};
+
     // ตรวจสอบข้อมูลที่จำเป็น
     if (!product.barcode) {
-      Swal.fire({
-        title: "กรุณากรอกข้อมูล",
-        text: "กรุณากรอกบาร์โค้ด",
-        icon: "warning",
-      });
+      errors.barcode = "กรุณากรอกบาร์โค้ด";
+    } else if (product.barcode.length !== 13) {
+      errors.barcode = "บาร์โค้ดต้องมีความยาว 13 หลัก";
+    }
+
+    if (!product.name) {
+      errors.name = "กรุณากรอกชื่อสินค้า";
+    }
+
+    if (!product.cost) {
+      errors.cost = "กรุณากรอกราคาทุน";
+    }
+
+    if (!product.price) {
+      errors.price = "กรุณากรอกราคาจำหน่าย";
+    } else if (product.cost && parseFloat(product.price) < parseFloat(product.cost)) {
+      errors.price = "ราคาจำหน่ายต้องไม่น้อยกว่าราคาทุน";
+    }
+
+    if (!product.category) {
+      errors.category = "โปรดกรอกข้อมูลให้ครบถ้วน";
+    }
+
+    if (!product.units_of_measure) {
+      errors.units_of_measure = "กรุณากรอกหน่วย";
+    }
+
+    // ถ้ามี errors ให้แสดงและไม่ส่งข้อมูล
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       return;
     }
 
-    // ตรวจสอบความยาวบาร์โค้ด
-    if (product.barcode.length !== 13) {
-      Swal.fire({
-        title: "บาร์โค้ดไม่ถูกต้อง",
-        text: "บาร์โค้ดต้องมีความยาว 13 หลัก",
-        icon: "warning",
-      });
-      return;
-    }
-
-    // ตรวจสอบบาร์โค้ด
+    // ตรวจสอบบาร์โค้ดซ้ำ
     if (product.barcode !== product.originalBarcode) {
       try {
         const res = await axios.get(
@@ -133,62 +153,12 @@ function Product() {
         );
 
         if (res.data.exists) {
-          Swal.fire({
-            title: "บาร์โค้ดซ้ำ",
-            text: "บาร์โค้ดนี้มีอยู่ในระบบแล้ว กรุณาใช้บาร์โค้ดอื่น",
-            icon: "warning",
-          });
+          setFormErrors({ barcode: "บาร์โค้ดนี้มีอยู่ในระบบแล้ว กรุณาใช้บาร์โค้ดอื่น" });
           return;
         }
       } catch (error) {
         console.error("Error checking barcode:", error);
       }
-    }
-
-    if (!product.name) {
-      Swal.fire({
-        title: "กรุณากรอกข้อมูล",
-        text: "กรุณากรอกชื่อสินค้า",
-        icon: "warning",
-      });
-      return;
-    }
-
-    if (!product.cost) {
-      Swal.fire({
-        title: "กรุณากรอกข้อมูล",
-        text: "กรุณากรอกราคาทุน",
-        icon: "warning",
-      });
-      return;
-    }
-
-    if (!product.price) {
-      Swal.fire({
-        title: "กรุณากรอกข้อมูล",
-        text: "กรุณากรอกราคาจำหน่าย",
-        icon: "warning",
-      });
-      return;
-    }
-
-    // ตรวจสอบราคาขายต้องไม่น้อยกว่าราคาทุน
-    if (parseFloat(product.price) < parseFloat(product.cost)) {
-      Swal.fire({
-        title: "ราคาไม่ถูกต้อง",
-        text: "ราคาจำหน่ายต้องไม่น้อยกว่าราคาทุน",
-        icon: "warning",
-      });
-      return;
-    }
-
-    if (!product.category) {
-      Swal.fire({
-        title: "กรุณากรอกข้อมูล",
-        text: "กรุณาเลือกประเภทสินค้า",
-        icon: "warning",
-      });
-      return;
     }
 
     // ดำเนินการบันทึกข้อมูล
@@ -223,6 +193,7 @@ function Product() {
   const cleanupModalAndPreview = () => {
     setImagePreview(null);
     setProductImage({});
+    setFormErrors({}); // รีเซ็ต form errors
   };
 
   // อัปเดตฟังก์ชันปิดโมดัลให้มีการล้างข้อมูล
@@ -288,9 +259,33 @@ function Product() {
 
   const handleChangeFile = (files) => {
     if (files && files[0]) {
-      setProductImage(files[0]);
+      const file = files[0];
+      const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+      
+      // ตรวจสอบขนาดไฟล์
+      if (file.size > maxSize) {
+        Swal.fire({
+          title: "ไฟล์รูปภาพใหญ่เกินไป",
+          text: "กรุณาเลือกไฟล์รูปภาพที่มีขนาดไม่เกิน 10MB",
+          icon: "warning",
+        });
+        return;
+      }
+      
+      // ตรวจสอบประเภทไฟล์
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+      if (!allowedTypes.includes(file.type)) {
+        Swal.fire({
+          title: "ประเภทไฟล์ไม่ถูกต้อง",
+          text: "กรุณาเลือกไฟล์รูปภาพ (JPG, PNG, GIF เท่านั้น)",
+          icon: "warning",
+        });
+        return;
+      }
+      
+      setProductImage(file);
       // สร้าง URL สำหรับแสดงตัวอย่างรูปภาพ
-      const previewUrl = URL.createObjectURL(files[0]);
+      const previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
     }
   };
@@ -309,8 +304,19 @@ function Product() {
     if (!productImage || !productImage.name) {
       Swal.fire({
         title: "Error",
-        text: "กรุณาเลือกไฟล์รูปภาพก่อนอัพโหลด",
+        text: "กรุณาเลือกไฟล์รูปภาพก่อนอัปโหลด",
         icon: "error",
+      });
+      return;
+    }
+
+    // ตรวจสอบขนาดไฟล์อีกครั้งก่อนอัปโหลด
+    const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+    if (productImage.size > maxSize) {
+      Swal.fire({
+        title: "ไฟล์รูปภาพใหญ่เกินไป",
+        text: "กรุณาเลือกไฟล์รูปภาพที่มีขนาดไม่เกิน 10MB",
+        icon: "warning",
       });
       return;
     }
@@ -351,6 +357,32 @@ function Product() {
         // อัปเดตรูปภาพสินค้าในโมดัลทันที
         await fetchDataProductImage({ id: product.id });
 
+        // ตั้งรูปที่อัปโหลดเป็น main image ทันที
+        try {
+          const imageListRes = await axios.get(
+            config.api_path + "/productImage/list/" + product.id,
+            config.headers()
+          );
+          
+          if (imageListRes.data.message === "success" && imageListRes.data.results.length > 0) {
+            // หารูปที่เพิ่งอัปโหลด (รูปล่าสุด)
+            const latestImage = imageListRes.data.results[imageListRes.data.results.length - 1];
+            
+            // ตั้งเป็น main image
+            const setMainRes = await axios.get(
+              config.api_path + "/productImage/chooseMainImage/" + latestImage.id + "/" + product.id,
+              config.headers()
+            );
+            
+            if (setMainRes.data.message === "success") {
+              // อัปเดตรูปภาพในโมดัลอีกครั้งหลังตั้งเป็น main
+              await fetchDataProductImage({ id: product.id });
+            }
+          }
+        } catch (error) {
+          console.error("Error setting as main image:", error);
+        }
+
         // อัปเดตรูปภาพในรายการสินค้าเฉพาะรายการนี้
         try {
           const imageRes = await axios.get(
@@ -375,9 +407,9 @@ function Product() {
         // แสดงข้อความสำเร็จทันที
         Swal.fire({
           title: "อัปโหลดสำเร็จ",
-          text: "อัปโหลดภาพสินค้าเรียบร้อยแล้ว",
+          text: "อัปโหลดภาพสินค้าเรียบร้อยแล้วและตั้งเป็นภาพหลัก",
           icon: "success",
-          timer: 1000,
+          timer: 1500,
           showConfirmButton: false,
         });
       }
@@ -545,6 +577,11 @@ function Product() {
     // อนุญาตให้กรอกได้เฉพาะตัวเลขและความยาวไม่เกิน 13 หลัก
     if (/^\d{0,13}$/.test(value)) {
       setProduct({ ...product, barcode: value });
+      
+      // ลบ error เมื่อกรอกข้อมูล
+      if (formErrors.barcode) {
+        setFormErrors({ ...formErrors, barcode: undefined });
+      }
 
       // ตรวจสอบเมื่อกรอกครบ 13 หลัก
       if (value.length === 13 && value !== product.originalBarcode) {
@@ -555,11 +592,7 @@ function Product() {
           );
 
           if (res.data.exists) {
-            Swal.fire({
-              title: "บาร์โค้ดซ้ำ",
-              text: "บาร์โค้ดนี้มีอยู่ในระบบแล้ว กรุณาใช้บาร์โค้ดอื่น",
-              icon: "warning",
-            });
+            setFormErrors({ ...formErrors, barcode: "บาร์โค้ดนี้มีอยู่ในระบบแล้ว กรุณาใช้บาร์โค้ดอื่น" });
           }
         } catch (error) {
           console.error("Error checking barcode:", error);
@@ -1259,7 +1292,7 @@ function Product() {
                       onClick={handleUpload}
                       className="btn btn-primary shadow-sm"
                     >
-                      <i className="fa fa-cloud-upload mr-2"></i> อัพโหลดรูปภาพ
+                      <i className="fa fa-cloud-upload mr-2"></i> อัปโหลดรูปภาพ
                     </button>
                   </div>
                 )}
@@ -1334,13 +1367,27 @@ function Product() {
                 </label>
                 <input
                   value={product.name || ""}
-                  onChange={(e) =>
-                    setProduct({ ...product, name: e.target.value })
-                  }
+                  onChange={(e) => {
+                    setProduct({ ...product, name: e.target.value });
+                    // ลบ error เมื่อกรอกข้อมูล
+                    if (formErrors.name) {
+                      setFormErrors({ ...formErrors, name: undefined });
+                    }
+                  }}
                   type="text"
                   className="form-control shadow-sm"
+                  style={{
+                    borderColor: formErrors.name ? '#dc3545' : '#ced4da',
+                    boxShadow: formErrors.name ? '0 0 0 0.2rem rgba(220, 53, 69, 0.25)' : 'none',
+                  }}
                   required
                 />
+                {formErrors.name && (
+                  <div className="mt-1" style={{ color: '#dc3545', fontSize: '14px', display: 'flex', alignItems: 'center' }}>
+                    <i className="fa fa-exclamation-triangle mr-1" style={{ color: '#dc3545' }}></i>
+                    {formErrors.name}
+                  </div>
+                )}
               </div>
 
               <div className="form-group col-md-6">
@@ -1349,14 +1396,28 @@ function Product() {
                 </label>
                 <input
                   value={product.cost || ""}
-                  onChange={(e) =>
-                    setProduct({ ...product, cost: e.target.value })
-                  }
+                  onChange={(e) => {
+                    setProduct({ ...product, cost: e.target.value });
+                    // ลบ error เมื่อกรอกข้อมูล
+                    if (formErrors.cost) {
+                      setFormErrors({ ...formErrors, cost: undefined });
+                    }
+                  }}
                   type="number"
                   className="form-control shadow-sm"
+                  style={{
+                    borderColor: formErrors.cost ? '#dc3545' : '#ced4da',
+                    boxShadow: formErrors.cost ? '0 0 0 0.2rem rgba(220, 53, 69, 0.25)' : 'none',
+                  }}
                   required
                   min="0"
                 />
+                {formErrors.cost && (
+                  <div className="mt-1" style={{ color: '#dc3545', fontSize: '14px', display: 'flex', alignItems: 'center' }}>
+                    <i className="fa fa-exclamation-triangle mr-1" style={{ color: '#dc3545' }}></i>
+                    {formErrors.cost}
+                  </div>
+                )}
               </div>
               <div className="form-group col-md-6">
                 <label>
@@ -1367,28 +1428,29 @@ function Product() {
                   onChange={(e) => {
                     const newPrice = e.target.value;
                     setProduct({ ...product, price: newPrice });
-
-                    // ตรวจสอบ real-time ถ้ามีราคาทุนและราคาขายแล้ว
-                    if (
-                      product.cost &&
-                      newPrice &&
-                      parseFloat(newPrice) < parseFloat(product.cost)
-                    ) {
-                      e.target.style.borderColor = "#dc3545";
-                      e.target.style.boxShadow =
-                        "0 0 0 0.2rem rgba(220, 53, 69, 0.25)";
-                    } else {
-                      e.target.style.borderColor = "#ced4da";
-                      e.target.style.boxShadow = "none";
+                    
+                    // ลบ error เมื่อกรอกข้อมูล
+                    if (formErrors.price) {
+                      setFormErrors({ ...formErrors, price: undefined });
                     }
                   }}
                   type="number"
                   className="form-control shadow-sm"
+                  style={{
+                    borderColor: formErrors.price ? '#dc3545' : '#ced4da',
+                    boxShadow: formErrors.price ? '0 0 0 0.2rem rgba(220, 53, 69, 0.25)' : 'none',
+                  }}
                   required
                   min="0"
                   step="0.01"
                 />
-                {product.cost &&
+                {formErrors.price ? (
+                  <div className="mt-1" style={{ color: '#dc3545', fontSize: '14px', display: 'flex', alignItems: 'center' }}>
+                    <i className="fa fa-exclamation-triangle mr-1" style={{ color: '#dc3545' }}></i>
+                    {formErrors.price}
+                  </div>
+                ) : (
+                  product.cost &&
                   product.price &&
                   parseFloat(product.price) < parseFloat(product.cost) && (
                     <small className="text-danger">
@@ -1396,7 +1458,8 @@ function Product() {
                       ราคาจำหน่ายต้องไม่น้อยกว่าราคาทุน (
                       {parseFloat(product.cost).toLocaleString("th-TH")} บาท)
                     </small>
-                  )}
+                  )
+                )}
               </div>
 
               <div className="form-group col-md-8">
@@ -1411,12 +1474,16 @@ function Product() {
                           ? { value: product.category, label: product.category }
                           : null
                       }
-                      onChange={(selectedOption) =>
+                      onChange={(selectedOption) => {
                         setProduct({
                           ...product,
                           category: selectedOption.value,
-                        })
-                      }
+                        });
+                        // ลบ error เมื่อเลือกประเภทสินค้า
+                        if (formErrors.category) {
+                          setFormErrors({ ...formErrors, category: undefined });
+                        }
+                      }}
                       options={categories.map((cat) => ({
                         value: cat.name,
                         label: cat.name,
@@ -1427,12 +1494,19 @@ function Product() {
                       isClearable={false}
                       isSearchable={true}
                       styles={{
-                        control: (baseStyles) => ({
+                        control: (baseStyles, state) => ({
                           ...baseStyles,
                           minHeight: "38px",
                           borderTopRightRadius: 0,
                           borderBottomRightRadius: 0,
                           borderRight: 0,
+                          borderColor: formErrors.category ? '#dc3545' : (state.isFocused ? '#80bdff' : '#ced4da'),
+                          boxShadow: formErrors.category 
+                            ? '0 0 0 0.2rem rgba(220, 53, 69, 0.25)' 
+                            : (state.isFocused ? '0 0 0 0.2rem rgba(0, 123, 255, 0.25)' : 'none'),
+                          '&:hover': {
+                            borderColor: formErrors.category ? '#dc3545' : '#80bdff',
+                          }
                         }),
                         container: (baseStyles) => ({
                           ...baseStyles,
@@ -1443,7 +1517,7 @@ function Product() {
                   </div>
                   <button
                     type="button"
-                    className="btn btn-outline-secondary"
+                    className={`btn btn-outline-secondary ${formErrors.category ? 'border-danger' : ''}`}
                     onClick={handleCategoryManagement}
                     title="จัดการหมวดหมู่"
                     style={{
@@ -1453,11 +1527,18 @@ function Product() {
                       borderTopLeftRadius: 0,
                       borderBottomLeftRadius: 0,
                       borderLeft: "1px solid #ced4da",
+                      borderColor: formErrors.category ? '#dc3545' : '#ced4da',
                     }}
                   >
                     <i className="fa fa-cog"></i>
                   </button>
                 </div>
+                {formErrors.category && (
+                  <div className="mt-1" style={{ color: '#dc3545', fontSize: '14px', display: 'flex', alignItems: 'center' }}>
+                    <i className="fa fa-exclamation-triangle mr-1" style={{ color: '#dc3545' }}></i>
+                    {formErrors.category}
+                  </div>
+                )}
               </div>
               <div className="form-group col-md-4">
                 <label>
@@ -1466,18 +1547,32 @@ function Product() {
                 <div className="d-flex">
                   <input
                     value={product.units_of_measure || ""}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       setProduct({
                         ...product,
                         units_of_measure: e.target.value,
-                      })
-                    }
+                      });
+                      // ลบ error เมื่อกรอกข้อมูล
+                      if (formErrors.units_of_measure) {
+                        setFormErrors({ ...formErrors, units_of_measure: undefined });
+                      }
+                    }}
                     type="text"
                     className="form-control shadow-sm"
+                    style={{
+                      borderColor: formErrors.units_of_measure ? '#dc3545' : '#ced4da',
+                      boxShadow: formErrors.units_of_measure ? '0 0 0 0.2rem rgba(220, 53, 69, 0.25)' : 'none',
+                    }}
                     required
                     placeholder=" ชิ้น, แพ็ค, ลิตร"
                   />
                 </div>
+                {formErrors.units_of_measure && (
+                  <div className="mt-1" style={{ color: '#dc3545', fontSize: '14px', display: 'flex', alignItems: 'center' }}>
+                    <i className="fa fa-exclamation-triangle mr-1" style={{ color: '#dc3545' }}></i>
+                    {formErrors.units_of_measure}
+                  </div>
+                )}
               </div>
               <div className="form-group col-md-12">
                 <label>
@@ -1489,6 +1584,10 @@ function Product() {
                     onChange={handleBarcodeChange}
                     type="text"
                     className="form-control shadow-sm"
+                    style={{
+                      borderColor: formErrors.barcode ? '#dc3545' : '#ced4da',
+                      boxShadow: formErrors.barcode ? '0 0 0 0.2rem rgba(220, 53, 69, 0.25)' : 'none',
+                    }}
                     required
                     maxLength="13"
                     pattern="\d{13}"
@@ -1506,10 +1605,17 @@ function Product() {
                     </button>
                   </div>
                 </div>
-                <small className="text-muted">
-                  บาร์โค้ดต้องเป็นตัวเลข 13 หลัก (
-                  {(product.barcode || "").length}/13)
-                </small>
+                {formErrors.barcode ? (
+                  <div className="mt-1" style={{ color: '#dc3545', fontSize: '14px', display: 'flex', alignItems: 'center' }}>
+                    <i className="fa fa-exclamation-triangle mr-1" style={{ color: '#dc3545' }}></i>
+                    {formErrors.barcode}
+                  </div>
+                ) : (
+                  <small className="text-muted">
+                    บาร์โค้ดต้องเป็นตัวเลข 13 หลัก (
+                    {(product.barcode || "").length}/13)
+                  </small>
+                )}
               </div>
             </div>
 

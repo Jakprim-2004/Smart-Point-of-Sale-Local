@@ -500,7 +500,7 @@ function Reward() {
         title="เพิ่มของรางวัลใหม่"
       >
         <form onSubmit={handleCreateReward}>
-          <div className="modal-body" style={{overflow: 'hidden', maxHeight: '350px'}}>
+          <div className="modal-body">
             <div className="mb-3">
               <label className="form-label">
                 ชื่อของรางวัล <span className="text-danger">*</span>
@@ -523,7 +523,7 @@ function Reward() {
                 onChange={(e) =>
                   setNewReward({ ...newReward, description: e.target.value })
                 }
-                rows="3"
+                rows="2"
               />
             </div>
             <div className="mb-3">
@@ -578,7 +578,7 @@ function Reward() {
         title="แก้ไขของรางวัล"
       >
         <form onSubmit={handleUpdateReward}>
-          <div className="modal-body" style={{overflow: 'hidden', maxHeight: '350px'}}>
+          <div className="modal-body">
             <div className="mb-3">
               <label className="form-label">ชื่อของรางวัล</label>
               <input
@@ -602,7 +602,7 @@ function Reward() {
                     description: e.target.value,
                   })
                 }
-                rows="3"
+                rows="2"
               />
             </div>
             <div className="mb-3">
@@ -1050,6 +1050,8 @@ function Reward() {
         .modal-body {
           padding: 30px;
           background: #fafbfc;
+          max-height: none;
+          overflow: visible;
         }
 
         .modal-footer {
@@ -1085,7 +1087,8 @@ function Reward() {
 
         textarea.form-control {
           resize: vertical;
-          min-height: 100px;
+          min-height: 60px;
+          max-height: 80px;
         }
 
         .text-danger {

@@ -2789,7 +2789,7 @@ function Sale() {
                         sum + parseFloat(item.qty) * parseFloat(item.price),
                       0
                     )
-                  ).toLocaleString("th-TH")} บาท`
+                  ).toLocaleString("th-TH")}บาท`
                   : "0 ชิ้น / 0 บาท"}
               </span>
             </div>
