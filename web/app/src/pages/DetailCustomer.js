@@ -6,7 +6,7 @@ import config from "../config";
 
 function DetailCustomer() {
     const [customer, setCustomer] = useState(null);
-    const [activeTab, setActiveTab] = useState('purchase'); // เปลี่ยนจาก 'info' เป็น 'purchase'
+    const [activeTab, setActiveTab] = useState('purchase'); 
     const [purchases, setPurchases] = useState([]);
     const [selectedBill, setSelectedBill] = useState(null);
     const [showBillModal, setShowBillModal] = useState(false);

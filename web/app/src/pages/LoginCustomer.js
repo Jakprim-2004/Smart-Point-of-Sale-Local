@@ -80,16 +80,9 @@ function LoginCustomer() {
                 return;
             }
 
-            if (response.data.result) {
+           if (response.data.result) {
                 localStorage.setItem('customerData', JSON.stringify(response.data.result));
-                Swal.fire({
-                    title: 'สำเร็จ',
-                    text: 'เข้าสู่ระบบสำเร็จ',
-                    icon: 'success',
-                    timer: 2000,
-                }).then(() => {
-                    navigate('/DetailCustomer');
-                });
+                navigate('/DetailCustomer');
             }
         } catch (error) {
             let errorMessage = 'เกิดข้อผิดพลาดในระบบ กรุณาลองใหม่อีกครั้ง';

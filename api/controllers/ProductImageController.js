@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
     filename: function (req, file, cb) {
         // สร้างชื่อไฟล์ที่ไม่ซ้ำกัน
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const ext = path.extname(file.originalname);
+        const ext = path.extname(file.originalname); // นามสกุลไฟล์
         cb(null, file.fieldname + '-' + uniqueSuffix + ext);
     }
 });
