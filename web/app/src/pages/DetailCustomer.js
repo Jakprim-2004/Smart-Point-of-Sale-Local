@@ -188,7 +188,7 @@ function DetailCustomer() {
                                 <div className="mb-3 bill-info">
                                     <p><strong>วันที่:</strong> {new Date(selectedBill.createdAt).toLocaleString('th-TH')}</p>
                                     <p><strong>ชำระผ่าน:</strong> {getPaymentMethodThai(selectedBill.paymentMethod, selectedBill.description)}</p>
-                                    <p><strong>ยอดรวม:</strong> {selectedBill.totalAmount?.toLocaleString()} บาท</p>
+                                    <p><strong>ยอดรวม:</strong> {selectedBill.totalAmount?.toLocaleString("th-TH")} บาท</p>
                                     {/* แสดงรายละเอียดเพิ่มเติมสำหรับการใช้แต้ม */}
                                     {selectedBill.description && selectedBill.description.includes('ใช้แต้มสะสม') && (
                                         <div className="alert alert-info">
@@ -214,13 +214,13 @@ function DetailCustomer() {
                                                 <tr key={detail.id}>
                                                     <td className="product-name">{detail.productName || detail.Product?.name || 'ไม่พบชื่อสินค้า'}</td>
                                                     <td className="text-center price-cell">
-                                                        {parseFloat(detail.price || 0).toLocaleString()} บาท
+                                                        {parseFloat(detail.price || 0).toLocaleString("th-TH")} บาท
                                                     </td>
                                                     <td className="text-center qty-cell">
                                                         {detail.qty || 0}
                                                     </td>
                                                     <td className="text-end total-cell">
-                                                        {detail.subtotal?.toLocaleString()} บาท
+                                                        {detail.subtotal?.toLocaleString("th-TH")} บาท
                                                     </td>
                                                 </tr>
                                             ))}
@@ -251,7 +251,7 @@ function DetailCustomer() {
                                 <th>วันที่</th>
                                 <th>เลขที่บิล</th>
                                 <th>วิธีชำระ</th>
-                                <th>ยอดซื้อ</th>
+                                <th>ยอดซื้อ (บาท)</th>
                                 <th>แต้มที่ได้รับ</th>
                                 <th>การจัดการ</th>
                             </tr>
@@ -264,7 +264,7 @@ function DetailCustomer() {
                                     <td>
                                         <small>{getPaymentMethodThai(bill.paymentMethod, bill.description)}</small>
                                     </td>
-                                    <td>{bill.totalAmount?.toLocaleString()} บาท</td>
+                                    <td>{bill.totalAmount?.toLocaleString("th-TH")} บาท</td>
                                     <td>{Math.floor(bill.totalAmount / 100)}</td>
                                     <td>
                                         <button
@@ -318,7 +318,7 @@ function DetailCustomer() {
                                     </div>
                                     <div className="col-6 text-end">
                                         <small className="text-muted d-block">ยอดซื้อ</small>
-                                        <div className="text-success fw-bold">{bill.totalAmount?.toLocaleString()} บาท</div>
+                                        <div className="text-success fw-bold">{parseFloat(bill.totalAmount)?.toLocaleString("th-TH")}</div>
                                     </div>
                                 </div>
                                 <button
@@ -388,7 +388,7 @@ function DetailCustomer() {
                             <p className="info-item">
                                 <strong>ยอดใช้จ่ายสะสม:</strong>
                                 <span className="text-success fw-bold d-block d-md-inline mt-1 mt-md-0">
-                                    {parseFloat(customer.totalSpent).toLocaleString()} บาท
+                                    {parseFloat(customer.totalSpent).toLocaleString("th-TH")} บาท
                                 </span>
                             </p>
                         </div>
@@ -481,8 +481,8 @@ function DetailCustomer() {
                                                 }>
                                                     {transaction.transactionType === 'REDEEM_REWARD' ||
                                                         transaction.transactionType === 'DISCOUNT'
-                                                        ? `${transaction.points}`
-                                                        : `+${transaction.points}`}
+                                                        ? `-${transaction.points.toLocaleString("th-TH")}`
+                                                        : `+${transaction.points.toLocaleString("th-TH")}`}
                                                 </td>
                                             </tr>
                                         ))
@@ -523,8 +523,8 @@ function DetailCustomer() {
                                                 }`}>
                                                 {transaction.transactionType === 'REDEEM_REWARD' ||
                                                     transaction.transactionType === 'DISCOUNT'
-                                                    ? `${transaction.points}`
-                                                    : `+${transaction.points}`}
+                                                    ? `-${transaction.points.toLocaleString("th-TH")}`
+                                                    : `+${transaction.points.toLocaleString("th-TH")}`}
                                             </div>
                                         </div>
                                         <div className="mt-2">

@@ -25,19 +25,27 @@ app.post("/product/insert", Service.isLogin, async (req, res) => {
 // API สำหรับดึงรายการสินค้าทั้งหมด
 app.get("/product/list", Service.isLogin, async (req, res) => {
   const ProductImageModel = require("../models/ProductImageModel");
+  const CategoryModel = require("../models/CategoryModel");
 
   ProductModel.hasMany(ProductImageModel);
-
   try {
     const results = await ProductModel.findAll({
       where: {
         userId: Service.getMemberId(req)
       },
       order: [["id", "DESC"]],
-      include: {
-        model: ProductImageModel,
-        required: false, // อนุญาตให้แสดงสินค้าที่ไม่มีรูปภาพด้วย
-      },
+      include: [
+        {
+          model: ProductImageModel,
+          required: false, // อนุญาตให้แสดงสินค้าที่ไม่มีรูปภาพด้วย
+        },
+        {
+          model: CategoryModel,
+          as: 'categoryData',
+          required: false, // อนุญาตให้แสดงสินค้าที่ไม่มีหมวดหมู่ด้วย
+          attributes: ['id', 'name']
+        }
+      ],
     });
 
     // แปลงข้อมูลเพื่อให้ง่ายต่อการใช้งานใน frontend
@@ -105,6 +113,7 @@ app.post("/product/update", Service.isLogin, async (req, res) => {
 // API สำหรับดึงรายการสินค้าพร้อมรูปภาพหลักสำหรับหน้าร้าน
 app.get("/product/listForSale", Service.isLogin, async (req, res) => {
   const ProductImageModel = require("../models/ProductImageModel");
+  const CategoryModel = require("../models/CategoryModel");
 
   ProductModel.hasMany(ProductImageModel);
 
@@ -114,10 +123,18 @@ app.get("/product/listForSale", Service.isLogin, async (req, res) => {
         userId: Service.getMemberId(req)
       },
       order: [["id", "DESC"]],
-      include: {
-        model: ProductImageModel,
-        required: false, // อนุญาตให้แสดงสินค้าที่ไม่มีรูปภาพด้วย
-      },
+      include: [
+        {
+          model: ProductImageModel,
+          required: false, // อนุญาตให้แสดงสินค้าที่ไม่มีรูปภาพด้วย
+        },
+        {
+          model: CategoryModel,
+          as: 'categoryData',
+          required: false,
+          attributes: ['id', 'name']
+        }
+      ],
     });
 
     // แปลงข้อมูลเพื่อให้ง่ายต่อการใช้งานใน frontend
@@ -136,7 +153,10 @@ app.get("/product/listForSale", Service.isLogin, async (req, res) => {
         productImages: productData.ProductImages || [],
         imageUrl: mainImage ? mainImage.imageUrl : null,
         imageName: mainImage ? mainImage.imageName : null,
-        hasImage: !!mainImage
+        hasImage: !!mainImage,
+        // เพิ่มข้อมูลหมวดหมู่
+        categoryId: productData.category,
+        categoryName: productData.categoryData ? productData.categoryData.name : null
       };
     });
 

@@ -39,9 +39,16 @@ function Stock() {
         config.headers()
       );
       if (res.data.message === "success") {
-        setProducts(res.data.results);
+        // แปลง category จาก ID เป็นชื่อสำหรับแสดงผล
+        const productsWithCategory = res.data.results.map((product) => ({
+          ...product,
+          categoryId: product.category,
+          category: product.categoryData?.name || product.categoryName || "ไม่ระบุ",
+        }));
+        setProducts(productsWithCategory);
       }
     } catch (e) {
+      console.error("Error fetching products:", e);
     }
   };
 
@@ -71,9 +78,18 @@ function Stock() {
         config.headers()
       );
       if (res.data.message === "success") {
-        setStockReport(res.data.results);
+        // เพิ่มชื่อหมวดหมู่ให้กับ result
+        const reportsWithCategory = res.data.results.map(report => ({
+          ...report,
+          result: {
+            ...report.result,
+            category: report.result.categoryName || report.result.categoryData?.name || "ไม่ระบุ"
+          }
+        }));
+        setStockReport(reportsWithCategory);
       }
     } catch (e) {
+      console.error("Error fetching stock report:", e);
     }
   };
 
@@ -814,7 +830,7 @@ function Stock() {
                                             : "bg-info"
                                         }`}
                                       >
-                                        {Number(totalStock).toLocaleString()} ชิ้น
+                                        {Number(totalStock).toLocaleString("th-TH")} ชิ้น
                                       </span>
                                     </td>
                                     <td>
@@ -963,7 +979,7 @@ function Stock() {
                                         <span className="badge bg-warning text-dark fs-6">
                                           <i className="fas fa-exclamation-triangle me-1"></i>
                                           เหลือ{" "}
-                                          {Number(totalStock).toLocaleString()}{" "}
+                                          {Number(totalStock).toLocaleString("th-TH")}{" "}
                                           ชิ้น
                                         </span>
                                       )}

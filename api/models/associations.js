@@ -6,7 +6,21 @@ const CustomerModel = require('./CustomerModel');
 const PointTransactionModel = require('./PointTransactionModel');
 const Defer_paymentModel = require('./Defer_paymentModel');
 const MemberModel = require('./MemberModel');
+const CategoryModel = require('./CategoryModel');
 // const RefreshTokenModel = require('./RefreshTokenModel'); // ปิดการใช้งานชั่วคราว
+
+// การเชื่อมโยงระหว่าง Product และ Category
+ProductModel.belongsTo(CategoryModel, { 
+    foreignKey: 'category',
+    targetKey: 'id',
+    as: 'categoryData',
+    constraints: false
+});
+CategoryModel.hasMany(ProductModel, { 
+    foreignKey: 'category',
+    sourceKey: 'id',
+    constraints: false
+});
 
 // การเชื่อมโยงระหว่าง Product และ Stock
 ProductModel.hasMany(StockModel, { 

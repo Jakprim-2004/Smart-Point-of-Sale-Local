@@ -97,7 +97,7 @@ function PointHistory() {
                       </td>
                       <td className="text-end">
                         <span className="text-danger">
-                          -{transaction.points}
+                          -{transaction.points.toLocaleString("th-TH")}
                         </span>
                       </td>
                       <td>{transaction.description}</td>

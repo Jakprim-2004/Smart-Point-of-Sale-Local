@@ -309,6 +309,8 @@ router.get('/reportTopSellingProducts', async (req, res) => {
 router.get('/reportTopSellingCategories', async (req, res) => {
   try {
     const userId = service.getMemberId(req); 
+    const CategoryModel = require('../models/CategoryModel');
+    
     // ขอบเขตเวลาไทยสำหรับ ณ วันปัจจุบัน
     const now = new Date();
     const thaiDateStr = now.toLocaleString('en-CA', { timeZone: 'Asia/Bangkok' }).split(',')[0];
@@ -318,7 +320,8 @@ router.get('/reportTopSellingCategories', async (req, res) => {
    
     const topSellingCategories = await BillSaleDetailModel.findAll({
       attributes: [
-        [sequelize.col('product.category'), 'category'],
+        [sequelize.col('product.category'), 'categoryId'],
+        [sequelize.col('product->categoryData.name'), 'categoryName'],
         [sequelize.fn('SUM', sequelize.col('qty')), 'totalQty'],
         [sequelize.fn('SUM', 
           sequelize.literal('qty * "billSaleDetail"."price"') 
@@ -327,7 +330,13 @@ router.get('/reportTopSellingCategories', async (req, res) => {
       include: [{ 
         model: ProductModel, 
         as: 'product',
-        attributes: ['category'], 
+        attributes: [],
+        include: [{
+          model: CategoryModel,
+          as: 'categoryData',
+          attributes: [],
+          required: false
+        }],
         required: true 
       },
       {
@@ -341,16 +350,16 @@ router.get('/reportTopSellingCategories', async (req, res) => {
         },
         required: true 
       }],
-      group: ['product.id', 'product.category'],
+      group: ['product.category', 'product->categoryData.name'],
       having: sequelize.literal('SUM(qty) > 0'),
       order: [[sequelize.fn('SUM', sequelize.col('qty')), 'DESC']], 
-      limit: 5
+      limit: 5,
+      raw: true
     });
 
-    const results = topSellingCategories.map(category => {
-      const data = category.get({ plain: true });
+    const results = topSellingCategories.map(data => {
       return {
-        category: data.category || 'ไม่ระบุหมวดหมู่',
+        category: data.categoryName || 'ไม่ระบุหมวดหมู่',
         totalAmount: parseFloat(data.totalAmount) || 0,
         totalQty: parseInt(data.totalQty) || 0
       };

@@ -25,19 +25,33 @@ app.post('/stock/save', Service.isLogin, async (req, res) => {
 app.get('/stock/list', Service.isLogin, async (req, res) => {
     try {
         const ProductModel = require('../models/ProductModel');
-        StockModel.belongsTo(ProductModel);
-
+        const CategoryModel = require('../models/CategoryModel');
+        
         const results = await StockModel.findAll({
             where: {
                 userId: Service.getMemberId(req)
             },
             order: [['id', 'DESC']],
             include: {
-                model: ProductModel
+                model: ProductModel,
+                include: [{
+                    model: CategoryModel,
+                    as: 'categoryData',
+                    required: false
+                }]
             }
         })
 
-        res.send({ message: 'success', results: results });
+        // แปลงข้อมูลเพื่อเพิ่มชื่อหมวดหมู่
+        const resultsWithCategory = results.map(stock => {
+            const stockData = stock.toJSON();
+            if (stockData.product && stockData.product.categoryData) {
+                stockData.product.category = stockData.product.categoryData.name;
+            }
+            return stockData;
+        });
+
+        res.send({ message: 'success', results: resultsWithCategory });
     } catch (e) {
         res.statusCode = 500;
         res.send({ message: e.message });
@@ -64,13 +78,9 @@ app.get('/stock/report', Service.isLogin, async (req, res) => {
     try {
         const ProductModel = require('../models/ProductModel');
         const BillSaleDetailModel = require('../models/BillSaleDetailModel');
+        const CategoryModel = require('../models/CategoryModel');
 
-        // Set up associations
-        ProductModel.hasMany(StockModel);
-        ProductModel.hasMany(BillSaleDetailModel);
-        StockModel.belongsTo(ProductModel);
-        BillSaleDetailModel.belongsTo(ProductModel);
-
+        // ไม่ต้องประกาศ associations ซ้ำ เพราะมีใน associations.js แล้ว
         let arr = [];
         
         // Get all products for this user
@@ -83,6 +93,11 @@ app.get('/stock/report', Service.isLogin, async (req, res) => {
                 {
                     model: BillSaleDetailModel,
                     required: false // Left join - แสดงสินค้าทั้งหมดแม้ไม่มีการขาย
+                },
+                {
+                    model: CategoryModel,
+                    as: 'categoryData',
+                    required: false
                 }
             ],
             where: {
@@ -119,9 +134,14 @@ app.get('/stock/report', Service.isLogin, async (req, res) => {
 
             const remainingStock = Math.max(0, stockIn - stockOut);
             
+            // แปลงข้อมูลเป็น plain object และเพิ่มชื่อหมวดหมู่
+            const resultData = result.toJSON();
+            if (resultData.categoryData) {
+                resultData.categoryName = resultData.categoryData.name;
+            }
 
             arr.push({
-                result: result, // ข้อมูลสินค้า
+                result: resultData, // ข้อมูลสินค้า
                 stockIn: stockIn, // จำนวนรับเข้า
                 stockOut: stockOut // จำนวนขายออก
             });

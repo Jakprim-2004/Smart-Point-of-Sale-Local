@@ -345,8 +345,8 @@ function Customer() {
                                             />
                                         ) : customer.email}
                                     </td>
-                                    <td>{customer.points}</td>
-                                    <td>{customer.totalSpent}</td>
+                                    <td>{customer.points.toLocaleString("th-TH")}</td>
+                                    <td>{parseFloat(customer.totalSpent).toLocaleString("th-TH")}</td>
                                     <td>
                                         {editCustomer?.id === customer.id ? (
                                             <button className="btn btn-success me-2" onClick={handleSave}>

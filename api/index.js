@@ -17,8 +17,8 @@ app.use(bodyParser.json());
 // Static files for uploads
 app.use("/uploads", express.static("uploads"));
 
-
-
+// Load model associations
+require('./models/associations');
 
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to Smart POS API' });

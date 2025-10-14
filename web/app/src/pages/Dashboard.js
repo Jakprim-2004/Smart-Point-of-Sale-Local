@@ -733,15 +733,15 @@ function Dashboard() {
               </div>
               <div className="metric-number">
                 {dailyViewMode === 'today' 
-                  ? todaySales.totalAmount.toLocaleString()
-                  : todaySales.yesterdayTotal.toLocaleString()
+                  ? todaySales.totalAmount.toLocaleString("th-TH")
+                  : todaySales.yesterdayTotal.toLocaleString("th-TH")
                 } บาท
               </div>
               <div className="comparison-text mt-3">
                 <i className="fas fa-chart-line me-2"></i>
                 {dailyViewMode === 'today' 
-                  ? `เมื่อวาน: ${todaySales.yesterdayTotal.toLocaleString()} บาท`
-                  : `วันนี้: ${todaySales.totalAmount.toLocaleString()} บาท`
+                  ? `เมื่อวาน: ${todaySales.yesterdayTotal.toLocaleString("th-TH")} บาท`
+                  : `วันนี้: ${todaySales.totalAmount.toLocaleString("th-TH")} บาท`
                 }
               </div>
             </div>
@@ -783,15 +783,15 @@ function Dashboard() {
               <div className="metric-label mb-2">ค่าเฉลี่ยต่อบิล</div>
               <div className="metric-number">
                 {dailyViewMode === 'today' 
-                  ? todaySales.averagePerBill.toLocaleString()
-                  : todaySales.yesterdayAveragePerBill.toLocaleString()
+                  ? todaySales.averagePerBill.toLocaleString("th-TH")
+                  : todaySales.yesterdayAveragePerBill.toLocaleString("th-TH")
                 } บาท
               </div>
               <div className="comparison-text mt-3">
                 <i className="fas fa-calculator me-2"></i>
                 {dailyViewMode === 'today' 
-                  ? `เมื่อวาน: ${todaySales.yesterdayAveragePerBill.toLocaleString()} บาท`
-                  : `วันนี้: ${todaySales.averagePerBill.toLocaleString()} บาท`
+                  ? `เมื่อวาน: ${todaySales.yesterdayAveragePerBill.toLocaleString("th-TH")} บาท`
+                  : `วันนี้: ${todaySales.averagePerBill.toLocaleString("th-TH")} บาท`
                 }
               </div>
             </div>

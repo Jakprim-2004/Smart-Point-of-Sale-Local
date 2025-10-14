@@ -7,13 +7,7 @@ const jwt = require("jsonwebtoken");
 const service = require("./Service");
 const CategoryModel = require("../models/CategoryModel");
 
-/**
- * API สำหรับดึงหมวดหมู่สินค้าทั้งหมดของผู้ใช้
- * @route GET /category/list
- * @description ดึงรายการหมวดหมู่สินค้าทั้งหมดสำหรับผู้ใช้ที่ล็อกอินอยู่
- * @access Private - ต้องมีการล็อกอินและมี token
- * @returns {Object} ส่งคืน message และ results เป็นอาร์เรย์ของหมวดหมู่ เรียงตาม name
- */
+
 app.get("/category/list", async (req, res) => {
   try {
     // ดึง userId จากโทเคนที่แนบมากับ request
@@ -118,29 +112,72 @@ app.post("/category/update/:id", async (req, res) => {
 /**
  * API สำหรับลบหมวดหมู่สินค้า
  * @route DELETE /category/delete/:id
- * @description ลบหมวดหมู่สินค้าตาม ID ที่ระบุ
+ * @description ลบหมวดหมู่สินค้าตาม ID ที่ระบุ และย้ายสินค้าไปหมวดหมู่ "อื่นๆ"
  * @param {string} id - ID ของหมวดหมู่ที่ต้องการลบ
  * @access Private - ต้องมีการล็อกอินและมี token
  * @returns {Object} ส่งคืน message แสดงความสำเร็จ หรือ error ถ้าไม่สำเร็จ
  */
 app.delete("/category/delete/:id", async (req, res) => {
     try {
+        const ProductModel = require("../models/ProductModel");
+        
         // ดึง userId จาก token เพื่อตรวจสอบสิทธิ์
         const userId = await service.getMemberId(req);
-        // ลบหมวดหมู่โดยระบุทั้ง ID และ userId เพื่อความปลอดภัย
-        const result = await CategoryModel.destroy({
-            where: { id: req.params.id, userId: userId }
+        const categoryId = req.params.id;
+        
+        // ตรวจสอบว่าหมวดหมู่ที่จะลบมีอยู่จริง
+        const categoryToDelete = await CategoryModel.findOne({
+            where: { id: categoryId, userId: userId }
         });
         
-        // ตรวจสอบผลลัพธ์การลบ - ถ้า result เป็น 0 แสดงว่าไม่พบข้อมูลที่ตรงกับเงื่อนไข
-        if (result === 0) {
+        if (!categoryToDelete) {
             return res.status(404).json({ message: "error", error: "Category not found" });
         }
         
-        // ส่ง response ยืนยันความสำเร็จ
-        res.json({ message: "success" });
+        // ตรวจสอบว่ามีสินค้าในหมวดหมู่นี้หรือไม่
+        const productsInCategory = await ProductModel.count({
+            where: { category: categoryId, userId: userId }
+        });
+        
+        if (productsInCategory > 0) {
+            // มีสินค้าอยู่ในหมวดหมู่นี้ ต้องย้ายไปหมวดหมู่ "อื่นๆ"
+            
+            // 1. หาหรือสร้างหมวดหมู่ "อื่นๆ"
+            let otherCategory = await CategoryModel.findOne({
+                where: { name: "อื่นๆ", userId: userId }
+            });
+            
+            if (!otherCategory) {
+                // สร้างหมวดหมู่ "อื่นๆ" ใหม่
+                otherCategory = await CategoryModel.create({
+                    name: "อื่นๆ",
+                    userId: userId
+                });
+            }
+            
+            // 2. ย้ายสินค้าทั้งหมดไปหมวดหมู่ "อื่นๆ"
+            await ProductModel.update(
+                { category: otherCategory.id },
+                { where: { category: categoryId, userId: userId } }
+            );
+        }
+        
+        // 3. ลบหมวดหมู่
+        await CategoryModel.destroy({
+            where: { id: categoryId, userId: userId }
+        });
+        
+        // ส่ง response ยืนยันความสำเร็จพร้อมข้อมูลเพิ่มเติม
+        res.json({ 
+            message: "success",
+            movedProducts: productsInCategory,
+            info: productsInCategory > 0 
+                ? `ย้ายสินค้า ${productsInCategory} รายการไปหมวดหมู่ "อื่นๆ" แล้ว` 
+                : "ลบหมวดหมู่สำเร็จ"
+        });
     } catch (error) {
         // จัดการกับข้อผิดพลาดและส่งกลับไปยัง client
+        console.error("Error deleting category:", error);
         res.status(500).json({ message: "error", error: error.message });
     }
 });

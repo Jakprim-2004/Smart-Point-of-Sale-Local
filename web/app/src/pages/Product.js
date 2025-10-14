@@ -37,6 +37,7 @@ function Product() {
         config.headers()
       );
       if (res.data.message === "success") {
+        console.log('Product API Response:', res.data.results[0]); // ดูข้อมูล product ตัวแรก
         // เพิ่มการเช็คว่ามีรูปภาพหลักหรือไม่
         const productsWithImageStatus = await Promise.all(
           res.data.results.map(async (product) => {
@@ -50,6 +51,9 @@ function Product() {
               mainImageUrl: mainImage
                 ? `${config.api_path}${mainImage.imageUrl}`
                 : null,
+              // เก็บทั้ง categoryId และ categoryName
+              categoryId: product.category, // ID ของหมวดหมู่
+              category: product.categoryData?.name || product.categoryName || "", // ชื่อหมวดหมู่สำหรับแสดงผล
             };
           })
         );
@@ -446,6 +450,7 @@ function Product() {
     setProduct({
       ...item,
       originalBarcode: item.barcode, // เก็บค่าบาร์โค้ดเดิมไว้
+      category: item.categoryId || item.category, // ใช้ categoryId สำหรับบันทึก
     });
     fetchDataProductImage(item);
   };
@@ -809,7 +814,7 @@ function Product() {
                         fontWeight: 600,
                       }}
                     >
-                      ประเภท
+                      หมวดหมู่
                     </th>
                     <th
                       className="py-3"
@@ -1471,13 +1476,18 @@ function Product() {
                     <Select
                       value={
                         product.category
-                          ? { value: product.category, label: product.category }
+                          ? (() => {
+                              const selectedCat = categories.find(cat => cat.id === product.category);
+                              return selectedCat 
+                                ? { value: selectedCat.id, label: selectedCat.name }
+                                : null;
+                            })()
                           : null
                       }
                       onChange={(selectedOption) => {
                         setProduct({
                           ...product,
-                          category: selectedOption.value,
+                          category: selectedOption.value, // บันทึกเป็น ID
                         });
                         // ลบ error เมื่อเลือกประเภทสินค้า
                         if (formErrors.category) {
@@ -1485,8 +1495,8 @@ function Product() {
                         }
                       }}
                       options={categories.map((cat) => ({
-                        value: cat.name,
-                        label: cat.name,
+                        value: cat.id, // ใช้ ID แทนชื่อ
+                        label: cat.name, // แสดงชื่อ
                       }))}
                       placeholder="เลือกประเภทสินค้า"
                       className="basic-single"

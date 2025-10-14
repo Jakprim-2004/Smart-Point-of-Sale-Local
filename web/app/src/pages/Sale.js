@@ -142,6 +142,9 @@ function Sale() {
                   remainingQty: stockItem ? stockItem.totalQty : 0,
                   imageUrl: mainImage ? mainImage.imageUrl : null,
                   mainImageUrl: mainImage ? `${config.api_path}${mainImage.imageUrl}` : null,
+                  // แปลง category จาก ID เป็นชื่อสำหรับแสดงผล
+                  categoryId: product.category,
+                  category: product.categoryName || "",
                 };
               } catch (imageError) {
                 console.error(`Error loading image for product ${product.id}:`, imageError);
@@ -150,6 +153,9 @@ function Sale() {
                   remainingQty: stockItem ? stockItem.totalQty : 0,
                   imageUrl: null,
                   mainImageUrl: null,
+                  // แปลง category จาก ID เป็นชื่อสำหรับแสดงผล
+                  categoryId: product.category,
+                  category: product.categoryName || "",
                 };
               }
             })
@@ -2050,7 +2056,7 @@ function Sale() {
                       <small className="text-muted">{customer.phone}</small>
                       {customer.points > 0 && (
                         <small className="text-success ms-2">
-                          ({customer.points} แต้ม)
+                          ({customer.points.toLocaleString("th-TH")} แต้ม)
                         </small>
                       )}
                     </div>
@@ -2102,7 +2108,7 @@ function Sale() {
                   {discountFromPoints > 0 && (
                     <div className="text-success mt-1">
                       <small>
-                        ส่วนลดจากแต้มสะสม: {discountFromPoints.toLocaleString()}{" "}
+                        ส่วนลดจากแต้มสะสม: {discountFromPoints.toLocaleString("th-TH")}{" "}
                         บาท
                       </small>
                     </div>

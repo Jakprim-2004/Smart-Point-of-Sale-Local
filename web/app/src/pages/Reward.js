@@ -362,7 +362,7 @@ function Reward() {
                           <small className="text-muted">{customer.phone}</small>
                         </div>
                         <span className="badge bg-primary rounded-pill">
-                          {customer.points} แต้ม
+                          {customer.points.toLocaleString("th-TH")} แต้ม
                         </span>
                       </button>
                     ))}
@@ -383,7 +383,7 @@ function Reward() {
           <div className="alert alert-info mb-4">
             <h5>ข้อมูลลูกค้า</h5>
             <p className="mb-1">ชื่อ: {selectedCustomer.name}</p>
-            <p className="mb-1">แต้มสะสม: {selectedCustomer.points} แต้ม</p>
+            <p className="mb-1">แต้มสะสม: {selectedCustomer.points.toLocaleString("th-TH")} แต้ม</p>
             <p className="mb-0">
               ระดับสมาชิก: {selectedCustomer.membershipTier}
             </p>
@@ -391,10 +391,10 @@ function Reward() {
             <div className="d-flex justify-content-between align-items-center">
               <span className="text-success fw-bold">
                 <i className="fas fa-gift me-2"></i>
-                ของรางวัลที่แลกได้: {getFilteredRewards().length} รายการ
+                ของรางวัลที่แลกได้: {getFilteredRewards().length.toLocaleString("th-TH")} รายการ
               </span>
               <span className="text-muted">
-                จากทั้งหมด {rewards.length} รายการ
+                จากทั้งหมด {rewards.length.toLocaleString("th-TH")} รายการ
               </span>
             </div>
           </div>
@@ -422,12 +422,12 @@ function Reward() {
                     <p className="card-text">{reward.description}</p>
                     <p className="card-text">
                       <small className="text-muted">
-                        ใช้แต้ม: {reward.pointsCost} แต้ม
+                        ใช้แต้ม: {reward.pointsCost.toLocaleString("th-TH")} แต้ม
                       </small>
                     </p>
                     <p className="card-text">
                       <small className="text-muted">
-                        คงเหลือ: {reward.stock} ชิ้น
+                        คงเหลือ: {reward.stock.toLocaleString("th-TH")} ชิ้น
                       </small>
                     </p>
                     <div className="d-flex gap-2">
@@ -475,7 +475,7 @@ function Reward() {
                     </p>
                     <div className="mt-3">
                       <small className="text-info">
-                        แต้มปัจจุบัน: {selectedCustomer.points} แต้ม
+                        แต้มปัจจุบัน: {selectedCustomer.points.toLocaleString("th-TH")} แต้ม
                       </small>
                     </div>
                   </div>
