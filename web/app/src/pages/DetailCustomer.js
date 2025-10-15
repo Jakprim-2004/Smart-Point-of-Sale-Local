@@ -264,7 +264,7 @@ function DetailCustomer() {
                                     <td>
                                         <small>{getPaymentMethodThai(bill.paymentMethod, bill.description)}</small>
                                     </td>
-                                    <td>฿{parseFloat(bill.totalAmount || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                    <td>{parseFloat(bill.totalAmount || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
 
                                     <td>{Math.floor(bill.totalAmount / 100)}</td>
                                     <td>
