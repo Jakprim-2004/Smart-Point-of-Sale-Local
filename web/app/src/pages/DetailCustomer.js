@@ -6,7 +6,7 @@ import config from "../config";
 
 function DetailCustomer() {
     const [customer, setCustomer] = useState(null);
-    const [activeTab, setActiveTab] = useState('purchase'); 
+    const [activeTab, setActiveTab] = useState('purchase');
     const [purchases, setPurchases] = useState([]);
     const [selectedBill, setSelectedBill] = useState(null);
     const [showBillModal, setShowBillModal] = useState(false);
@@ -264,7 +264,8 @@ function DetailCustomer() {
                                     <td>
                                         <small>{getPaymentMethodThai(bill.paymentMethod, bill.description)}</small>
                                     </td>
-                                    <td>{bill.totalAmount?.toLocaleString("th-TH")} บาท</td>
+                                    <td>฿{parseFloat(bill.totalAmount || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+
                                     <td>{Math.floor(bill.totalAmount / 100)}</td>
                                     <td>
                                         <button
@@ -517,9 +518,9 @@ function DetailCustomer() {
                                                 </small>
                                             </div>
                                             <div className={`fs-5 fw-bold ${transaction.transactionType === 'REDEEM_REWARD' ||
-                                                    transaction.transactionType === 'DISCOUNT'
-                                                    ? 'text-danger'
-                                                    : 'text-success'
+                                                transaction.transactionType === 'DISCOUNT'
+                                                ? 'text-danger'
+                                                : 'text-success'
                                                 }`}>
                                                 {transaction.transactionType === 'REDEEM_REWARD' ||
                                                     transaction.transactionType === 'DISCOUNT'
