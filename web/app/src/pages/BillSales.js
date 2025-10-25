@@ -348,9 +348,9 @@ function BillSales() {
             <div className="col-md-4">
               <div className="card bg-primary text-white border-0">
                 <div className="card-body p-3">
-                  <h6 className="mb-2">ยอดรวมทั้งสิ้น</h6>
+                  <h6 className="mb-2">ยอดรวมทั้งสิ้น (บาท)</h6>
                   <h4 className="mb-0">
-                    ฿{parseFloat(selectBill?.totalAmount || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {parseFloat(selectBill?.totalAmount || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </h4>
                 </div>
               </div>
