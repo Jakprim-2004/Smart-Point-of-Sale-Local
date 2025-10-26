@@ -68,7 +68,6 @@ Smart-Point-of-Sale-Local/
 - **PostgreSQL** - ระบบฐานข้อมูล
 - **Sequelize ORM** - จัดการฐานข้อมูลแบบ Object-Relational Mapping
 - **JWT (JSON Web Token)** - Authentication และ Authorization
-- **Cloudinary** - จัดเก็บและจัดการรูปภาพ
 - **Bcrypt** - เข้ารหัสรหัสผ่าน
 - **Express Rate Limit** - ป้องกัน DDoS และ Brute Force
 - **Helmet** - เพิ่มความปลอดภัยด้วย HTTP Headers
