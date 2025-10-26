@@ -321,5 +321,5 @@ npm start
 ## 📞 ติดต่อ
 
 หากมีคำถามหรือต้องการความช่วยเหลือ สามารถติดต่อผ่าน:
-- 📧 Email: [Create Issue on GitHub](https://github.com/Jakprim-2004/Smart-Point-of-Sale-Local/issues)
+- 📧 Email: caniyaya21@gmail.com
 - 📺 วิดีโอสาธิต: [YouTube](https://youtu.be/i-GQ9EBBTOE) 
